@@ -1,0 +1,11 @@
+
+include: "rules/common.smk"
+include: "rules/constants.smk"
+include: "rules/data.smk"
+include: "rules/hifiasm.smk"
+
+
+rule all:
+    input:
+        rules.get_input_dirs_only.input,
+        rules.hifiasm_only.input,

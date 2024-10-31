@@ -1,0 +1,96 @@
+samples:
+  mGorGor1:
+    threads: 50
+    mem: 255GB
+    data:
+      ont: 
+        uri: s3://genomeark/species/Gorilla_gorilla/mGorGor1/genomic_data/ont/
+        include: ["*.fq*"]
+        exclude: ["*old-guppy-runs/*", "*.bam*", "*fast5/*"]
+      hifi:
+        uri: s3://genomeark/species/Gorilla_gorilla/mGorGor1/genomic_data/pacbio_hifi/
+        include: ["*.hifi_reads.fq*"]
+        exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
+      hic:
+        uri: s3://genomeark/species/Gorilla_gorilla/mGorGor1/genomic_data/dovetail/
+        include: ["*.fastq.gz"]
+  
+  mPanPan1:
+    threads: 50
+    mem: 255GB
+    data:
+      ont: 
+        uri: s3://genomeark/species/Gorilla_gorilla/mPanPan1/genomic_data/ont/
+        include: ["*.fq*"]
+        exclude: ["*old-guppy-runs/*", "*.bam*", "*fast5/*"]
+      hifi: 
+        uri: s3://genomeark/species/Gorilla_gorilla/mPanPan1/genomic_data/pacbio_hifi/
+        include: ["*.hifi_reads.fq*"]
+        exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
+      hic: 
+        uri: s3://genomeark/species/Gorilla_gorilla/mPanPan1/genomic_data/dovetail/
+        include: ["*.fastq.gz"]
+
+  mPanTro3:
+    threads: 50
+    mem: 255GB
+    data:
+      ont: 
+        uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/ont/
+        include: ["*.fq*"]
+        exclude: ["*old-guppy-runs/*", "*.bam*", "*fast5/*"]
+      hifi: 
+        uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/pacbio_hifi/
+        include: ["*.hifi_reads.fq*"]
+        exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
+      hic: 
+        uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/dovetail/
+        include: ["*.fastq.gz"]
+
+  mPonAbe1:
+    threads: 50
+    mem: 255GB
+    data:
+      ont: 
+        uri: s3://genomeark/species/Pongo_abelii/mPonAbe1/genomic_data/ont/
+        include: ["*.fq*"]
+        exclude: ["*old-guppy-runs/*", "*.bam*", "*fast5/*"]
+      hifi: 
+        uri: s3://genomeark/species/Pongo_abelii/mPonAbe1/genomic_data/pacbio_hifi/
+        include: ["*.hifi_reads.fq*"]
+        exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
+      hic: 
+        uri: s3://genomeark/species/Pongo_abelii/mPonAbe1/genomic_data/dovetail/
+        include: ["*.fastq.gz"]
+
+  mPonPyg2:
+    threads: 50
+    mem: 255GB
+    data:
+      ont: 
+        uri: s3://genomeark/species/Pongo_pygmaeus/mPonPyg2/genomic_data/ont/
+        include: ["*.fq*"]
+        exclude: ["*old-guppy-runs/*", "*.bam*", "*fast5/*"]
+      hifi: 
+        uri: s3://genomeark/species/Pongo_pygmaeus/mPonPyg2/genomic_data/pacbio_hifi/
+        include: ["*.hifi_reads.fq*"]
+        exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
+      hic: 
+        uri: s3://genomeark/species/Pongo_pygmaeus/mPonPyg2/genomic_data/dovetail/
+        include: ["*.fastq.gz"]
+
+  mSymSyn1:
+    threads: 50
+    mem: 255GB
+    data:
+      ont: 
+        uri: s3://genomeark/species/Symphalangus_syndactylus/mSymSyn1/genomic_data/ont/
+        include: ["*.fq*"]
+        exclude: ["*old-guppy-runs/*", "*.bam*", "*fast5/*"]
+      hifi: 
+        uri: s3://genomeark/species/Symphalangus_syndactylus/mSymSyn1/genomic_data/pacbio_hifi/
+        include: ["*.hifi_reads.fq*"]
+        exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
+      hic: 
+        uri: s3://genomeark/species/Symphalangus_syndactylus/mSymSyn1/genomic_data/dovetail/
+        include: ["*.fastq.gz"]
