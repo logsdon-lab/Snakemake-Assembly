@@ -12,11 +12,11 @@ def get_dtype_config(sm: str, dtype: str) -> dict:
     return get_data_config(sm).get(dtype, {})
 
 
-def multi_flags(*vals, opt: str):
+def multi_flags(*vals, opt: str) -> str:
     return " ".join(f"{opt} {val}" for val in vals)
 
 
-def dtype_glob(sm: str, dtype: str, *, default=None):
+def dtype_glob(sm: str, dtype: str, *, default=None) -> list[str]:
     if not default:
         default = ["*.fastq.gz"]
     return get_dtype_config(sm, dtype).get("include", default)

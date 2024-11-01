@@ -27,7 +27,7 @@ rule aws_sync:
     shell:
         """
         aws s3 --no-sign-request sync {params.uri} {output} \
-        {params.include} {params.exclude} 2> {log}
+        {params.include} {params.exclude} &> {log}
         """
 
 

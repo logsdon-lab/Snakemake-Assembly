@@ -3,31 +3,31 @@ samples:
     threads: 50
     mem: 255GB
     data:
-      ont: 
+      ont:
         uri: s3://genomeark/species/Gorilla_gorilla/mGorGor1/genomic_data/ont/
-        include: ["*.fq*"]
+        include: ["*.fq.gz"]
         exclude: ["*old-guppy-runs/*", "*.bam*", "*fast5/*"]
       hifi:
         uri: s3://genomeark/species/Gorilla_gorilla/mGorGor1/genomic_data/pacbio_hifi/
-        include: ["*.hifi_reads.fq*"]
+        include: ["*.hifi_reads.fq.gz"]
         exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
       hic:
         uri: s3://genomeark/species/Gorilla_gorilla/mGorGor1/genomic_data/dovetail/
         include: ["*.fastq.gz"]
-  
+
   mPanPan1:
     threads: 50
     mem: 255GB
     data:
-      ont: 
+      ont:
         uri: s3://genomeark/species/Gorilla_gorilla/mPanPan1/genomic_data/ont/
-        include: ["*.fq*"]
+        include: ["*.fq.gz"]
         exclude: ["*old-guppy-runs/*", "*.bam*", "*fast5/*"]
-      hifi: 
+      hifi:
         uri: s3://genomeark/species/Gorilla_gorilla/mPanPan1/genomic_data/pacbio_hifi/
-        include: ["*.hifi_reads.fq*"]
+        include: ["*.hifi_reads.fq.gz"]
         exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
-      hic: 
+      hic:
         uri: s3://genomeark/species/Gorilla_gorilla/mPanPan1/genomic_data/dovetail/
         include: ["*.fastq.gz"]
 
@@ -35,15 +35,15 @@ samples:
     threads: 50
     mem: 255GB
     data:
-      ont: 
+      ont:
         uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/ont/
-        include: ["*.fq*"]
+        include: ["*.fq.gz"]
         exclude: ["*old-guppy-runs/*", "*.bam*", "*fast5/*"]
-      hifi: 
+      hifi:
         uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/pacbio_hifi/
-        include: ["*.hifi_reads.fq*"]
+        include: ["*.hifi_reads.fq.gz"]
         exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
-      hic: 
+      hic:
         uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/dovetail/
         include: ["*.fastq.gz"]
 
@@ -51,15 +51,15 @@ samples:
     threads: 50
     mem: 255GB
     data:
-      ont: 
+      ont:
         uri: s3://genomeark/species/Pongo_abelii/mPonAbe1/genomic_data/ont/
-        include: ["*.fq*"]
+        include: ["*.fq.gz"]
         exclude: ["*old-guppy-runs/*", "*.bam*", "*fast5/*"]
-      hifi: 
+      hifi:
         uri: s3://genomeark/species/Pongo_abelii/mPonAbe1/genomic_data/pacbio_hifi/
-        include: ["*.hifi_reads.fq*"]
+        include: ["*.hifi_reads.fq.gz"]
         exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
-      hic: 
+      hic:
         uri: s3://genomeark/species/Pongo_abelii/mPonAbe1/genomic_data/dovetail/
         include: ["*.fastq.gz"]
 
@@ -67,15 +67,15 @@ samples:
     threads: 50
     mem: 255GB
     data:
-      ont: 
+      ont:
         uri: s3://genomeark/species/Pongo_pygmaeus/mPonPyg2/genomic_data/ont/
-        include: ["*.fq*"]
+        include: ["*.fq.gz"]
         exclude: ["*old-guppy-runs/*", "*.bam*", "*fast5/*"]
-      hifi: 
+      hifi:
         uri: s3://genomeark/species/Pongo_pygmaeus/mPonPyg2/genomic_data/pacbio_hifi/
-        include: ["*.hifi_reads.fq*"]
+        include: ["*.hifi_reads.fq.gz"]
         exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
-      hic: 
+      hic:
         uri: s3://genomeark/species/Pongo_pygmaeus/mPonPyg2/genomic_data/dovetail/
         include: ["*.fastq.gz"]
 
@@ -83,14 +83,14 @@ samples:
     threads: 50
     mem: 255GB
     data:
-      ont: 
+      ont:
         uri: s3://genomeark/species/Symphalangus_syndactylus/mSymSyn1/genomic_data/ont/
-        include: ["*.fq*"]
+        include: ["*.fq.gz"]
         exclude: ["*old-guppy-runs/*", "*.bam*", "*fast5/*"]
-      hifi: 
+      hifi:
         uri: s3://genomeark/species/Symphalangus_syndactylus/mSymSyn1/genomic_data/pacbio_hifi/
-        include: ["*.hifi_reads.fq*"]
+        include: ["*.hifi_reads.fq.gz"]
         exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
-      hic: 
+      hic:
         uri: s3://genomeark/species/Symphalangus_syndactylus/mSymSyn1/genomic_data/dovetail/
         include: ["*.fastq.gz"]
