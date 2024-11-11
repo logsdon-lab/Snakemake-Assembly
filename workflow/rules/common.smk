@@ -1,7 +1,7 @@
 from os.path import join
 from typing import NamedTuple
 from collections import defaultdict
-from enum import StrEnum, auto
+from enum import Enum
 
 
 def get_data_config(sm: str) -> dict:

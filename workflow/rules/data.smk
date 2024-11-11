@@ -1,7 +1,7 @@
-class DataType(StrEnum):
-    ONT = auto()
-    HIFI = auto()
-    HIC = auto()
+class DataType(Enum):
+    ONT = "ont"
+    HIFI = "hifi"
+    HIC = "hic"
 
 
 rule aws_sync:
@@ -51,7 +51,10 @@ def get_data_dirs(wc) -> list:
     outputs = []
     sm = str(wc.sm)
     for dtype, settings in get_data_config(sm).items():
-        dtype = DataType(dtype)
+        try:
+            DataType(dtype)
+        except ValueError:
+            raise ValueError(f"Invalid datatype: {dtype}")
 
         if settings.get("uri"):
             output_dir = expand(rules.aws_sync.output, sm=sm, dtype=dtype)
