@@ -7,7 +7,7 @@ rule run_hifiasm:
         ont_dir=lambda wc: expand(DATA_DIR, sm=wc.sm, dtype="ont"),
         hifi_dir=lambda wc: expand(DATA_DIR, sm=wc.sm, dtype="hifi"),
     output:
-        join("results", "hifiasm", "{sm}"),
+        directory(join("results", "hifiasm", "{sm}")),
     conda:
         "../envs/hifiasm.yaml"
     threads: lambda wc: config["samples"][str(wc.sm)]["threads"]
