@@ -8,7 +8,7 @@ rule aws_sync:
     output:
         directory(join("data", "{dtype}", "{sm}")),
     params:
-        uri=lambda wc: get_data_config(str(wc.sm)).get(str(wc.dtype), {})["uri"],
+        uri=lambda wc: get_data_config(str(wc.sm)).get(str(wc.dtype), {}).get("uri"),
         include=lambda wc: multi_flags(
             *get_dtype_config(str(wc.sm), str(wc.dtype)).get("include", []),
             opt="--include",
@@ -33,9 +33,11 @@ rule aws_sync:
 
 rule symlink_data:
     input:
-        data_dir=lambda wc: get_data_config(str(wc.sm), str(wc.dtype))["path"],
+        data_dir=lambda wc: get_data_config(str(wc.sm))
+        .get(str(wc.dtype), {})
+        .get("path", []),
     output:
-        join("data", "{dtype}", "{sm}"),
+        directory(join("data", "{dtype}", "{sm}_link")),
     log:
         "logs/symlink_data_{dtype}_{sm}.log",
     shell:
@@ -44,40 +46,30 @@ rule symlink_data:
         """
 
 
-ruleorder: symlink_data > aws_sync
+def get_data_dirs() -> list:
+    outputs = defaultdict(lambda: defaultdict(list))
+    for sm, sm_settings in config["samples"].items():
+        for dtype, settings in sm_settings["data"].items():
+            try:
+                DataType(dtype)
+            except ValueError:
+                raise ValueError(f"Invalid datatype: {dtype}")
 
+            print(settings.get("uri"))
+            if settings.get("uri"):
+                output_dir = expand(rules.aws_sync.output, sm=sm, dtype=dtype)
+            elif settings.get("path"):
+                output_dir = expand(rules.symlink_data.output, sm=sm, dtype=dtype)
 
-def get_data_dirs(wc) -> list:
-    outputs = []
-    sm = str(wc.sm)
-    for dtype, settings in get_data_config(sm).items():
-        try:
-            DataType(dtype)
-        except ValueError:
-            raise ValueError(f"Invalid datatype: {dtype}")
-
-        if settings.get("uri"):
-            output_dir = expand(rules.aws_sync.output, sm=sm, dtype=dtype)
-        elif settings.get("path"):
-            output_dir = expand(rules.symlink_data.output, sm=sm, dtype=dtype)
-
-        if isinstance(output_dir, str):
-            outputs.append(output_dir)
-        elif isinstance(output_dir, list):
-            outputs.extend(output_dir)
-        else:
-            raise ValueError(f"Invalid {output_dir} for {sm}")
+            if isinstance(output_dir, str):
+                outputs[sm][dtype].append(output_dir)
+            elif isinstance(output_dir, list):
+                outputs[sm][dtype].extend(output_dir)
+            else:
+                raise ValueError(f"Invalid {output_dir} for {sm}")
 
     return outputs
 
 
-rule get_input_dirs:
-    input:
-        get_data_dirs,
-    output:
-        touch(temp("/tmp/input_dirs_{sm}.done")),
-
-
-rule get_input_dirs_only:
-    input:
-        expand(rules.get_input_dirs.output, sm=SAMPLES),
+# Global state.
+DATA_DIRS = get_data_dirs()

@@ -3,9 +3,9 @@
 rule run_hifiasm:
     input:
         # TODO: trios
-        hic_dir=lambda wc: expand(DATA_DIR, sm=wc.sm, dtype="hic"),
-        ont_dir=lambda wc: expand(DATA_DIR, sm=wc.sm, dtype="ont"),
-        hifi_dir=lambda wc: expand(DATA_DIR, sm=wc.sm, dtype="hifi"),
+        hic_dir=lambda wc: DATA_DIRS[wc.sm]["hic"],
+        ont_dir=lambda wc: DATA_DIRS[wc.sm]["ont"],
+        hifi_dir=lambda wc: DATA_DIRS[wc.sm]["hifi"],
     output:
         directory(join("results", "hifiasm", "{sm}")),
     conda:

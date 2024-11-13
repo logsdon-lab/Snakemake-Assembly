@@ -7,5 +7,4 @@ include: "rules/hifiasm.smk"
 
 rule all:
     input:
-        rules.get_input_dirs_only.input,
         rules.hifiasm_only.input,
