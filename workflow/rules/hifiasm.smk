@@ -13,6 +13,7 @@ rule run_hifiasm:
     threads: lambda wc: config["samples"][str(wc.sm)]["threads"]
     resources:
         mem=lambda wc: config["samples"][str(wc.sm)]["mem"],
+        lsf_extra=lambda wc: "-M " + config["samples"][str(wc.sm)]["mem"],
     log:
         "logs/run_hifiasm_{sm}.log",
     benchmark:
@@ -35,7 +36,7 @@ rule run_hifiasm:
         -o "{wildcards.sm}" \
         --h1 $(find ${{hic_dir}} {params.hic_glob} | grep -P {params.hic_h1_rgx} | paste -sd ",") \
         --h2 $(find ${{hic_dir}} {params.hic_glob} | grep -P {params.hic_h2_rgx} | paste -sd ",") \
-        --ul $(find ${{ont_dir}} {params.ont_glob} | paste -sd " ") \
+        --ul $(find ${{ont_dir}} {params.ont_glob} | paste -sd ",") \
         -t {threads} \
         $(find ${{hifi_dir}} {params.hifi_glob} | paste -sd " ") 2> "${{logpath}}"
         """
