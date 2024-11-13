@@ -55,7 +55,6 @@ def get_data_dirs() -> list:
             except ValueError:
                 raise ValueError(f"Invalid datatype: {dtype}")
 
-            print(settings.get("uri"))
             if settings.get("uri"):
                 output_dir = expand(rules.aws_sync.output, sm=sm, dtype=dtype)
             elif settings.get("path"):
