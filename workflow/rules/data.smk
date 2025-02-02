@@ -2,6 +2,8 @@ class DataType(Enum):
     ONT = "ont"
     HIFI = "hifi"
     HIC = "hic"
+    ILLUMINA_MAT = "illumina_mat"
+    ILLUMINA_PAT = "illumina_pat"
 
 
 rule aws_sync:

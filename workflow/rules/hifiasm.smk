@@ -44,15 +44,8 @@ rule run_hifiasm:
 
 # rule convert_gfa_to_fa:
 #     input:
-
 #     output:
-
 #     shell:
 #         """
 #         awk '/^S/{{print ">"$2;print $3}}'
 #         """
-
-
-rule hifiasm_only:
-    input:
-        expand(rules.run_hifiasm.output, sm=SAMPLES),

@@ -2,6 +2,7 @@ samples:
   mPanTro3:
     threads: 32
     mem: 250GB
+    assembler: hifiasm
     data:
       ont:
         uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/ont/

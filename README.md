@@ -21,6 +21,7 @@ samples:
   mPanTro3:
     threads: 40
     mem: 250GB
+    assembler: hifiasm
     data:
       ont:
         path: /project/logsdon_shared/data/PrimateT2T/ont/mPanTro3
@@ -33,5 +34,4 @@ samples:
       hic:
         path: /project/logsdon_shared/data/PrimateT2T/dovetail_hic/mPanTro3
         include: ["*.fastq.gz"]
-
 ```
