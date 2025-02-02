@@ -33,21 +33,6 @@ rule aws_sync:
         """
 
 
-rule symlink_data:
-    input:
-        data_dir=lambda wc: get_data_config(str(wc.sm))
-        .get(str(wc.dtype), {})
-        .get("path", []),
-    output:
-        directory(join("data", "{dtype}", "{sm}_link/")),
-    log:
-        "logs/symlink_data_{dtype}_{sm}.log",
-    shell:
-        """
-        ln -s {input} {output} 2> {log}
-        """
-
-
 def get_data_dirs() -> list:
     outputs = defaultdict(lambda: defaultdict(list))
     for sm, sm_settings in config["samples"].items():
@@ -60,7 +45,7 @@ def get_data_dirs() -> list:
             if settings.get("uri"):
                 output_dir = expand(rules.aws_sync.output, sm=sm, dtype=dtype)
             elif settings.get("path"):
-                output_dir = expand(rules.symlink_data.output, sm=sm, dtype=dtype)
+                output_dir = settings["path"]
 
             if isinstance(output_dir, str):
                 outputs[sm][dtype].append(output_dir)

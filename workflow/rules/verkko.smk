@@ -92,17 +92,7 @@ rule run_verkko:
         ont_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "ont"), opt="-name"),
         hifi_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "hifi"), opt="-name"),
         phasing_data_args=lambda wc, input: phasing_data_args(wc, input),
-        snakeopts=lambda wc: "--snakeopts '"
-        + " ".join(
-            [
-                "-j",
-                        str(config["samples"][str(wc.sm)]["threads"]),
-                        "-k",
-                        "--restart-times",
-                        "1",
-                    ]
-                )
-        + "'",
+        snakeopts=lambda wc: config["samples"][str(wc.sm)].get("snakeopts", ""),
     shell:
         """
         verkko -d {output} \
