@@ -1,3 +1,28 @@
+# rule count_kmers:
+#     input:
+
+#     output:
+#         "{hap}.yak"
+#     params:
+#         kmer_size="",
+#     shell:
+#         """
+#         # For paired end provide, two identical streams.
+#         yak count -b37 -t16 -o pat.yak <(cat pat_1.fq.gz pat_2.fq.gz) <(cat pat_1.fq.gz pat_2.fq.gz)
+#         """
+
+# def strand_data(wc):
+#     if "illumina_mat" in DATA_DIRS[wc.sm] and "illumina_pat" in DATA_DIRS[wc.sm]:
+#         return {"hap_kmers": expand(rules.generate_hapmers.output, sm=wc.sm)}
+#     else:
+#         return {}
+
+
+# def strand_data_args(wc, inputs):
+#     if "hap_kmers" in inputs.keys():
+#         return f"--hap-kmers {inputs.hap_kmers} trio"
+#     else:
+#         return ""
 
 
 rule run_hifiasm:

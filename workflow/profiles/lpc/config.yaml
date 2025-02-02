@@ -7,6 +7,7 @@ default-resources:
   lsf_queue: epistasis_long
   lsf_project: default
 printshellcmds: True
+keep-incomplete: True
 rerun-incomplete: True
 show-failed-logs: True
 rerun-triggers: mtime

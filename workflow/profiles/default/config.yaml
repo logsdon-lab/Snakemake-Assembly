@@ -3,5 +3,6 @@ software-deployment-method:
   - conda
 printshellcmds: True
 rerun-incomplete: True
+keep-incomplete: True
 show-failed-logs: True
 rerun-triggers: mtime

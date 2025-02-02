@@ -5,13 +5,15 @@ rule count_kmers:
     input:
         illumina_dir=lambda wc: DATA_DIRS[wc.sm][f"illumina_{wc.hap}"],
     output:
-        mer_db=join("results", "meryl", "{sm}", "{hap}_compress.k30.meryl"),
+        mer_db=join("results", "meryl", "{sm}", "{hap}_compress.meryl"),
     resources:
         mem=30,
     threads: lambda wc: config["samples"][str(wc.sm)]["threads"] // 2
     params:
         fq_glob=lambda wc, input: join(str(input.illumina_dir), ".*fastq.gz"),
-        kmer_size=lambda wc: 30,
+        kmer_size=lambda wc: config["samples"][str(wc.sm)]["data"][
+            f"illumina_{wc.hap}"
+        ].get("kmer_size", 30),
     conda:
         "../envs/verkko.yaml"
     shell:
@@ -25,8 +27,8 @@ rule generate_hapmers:
         mat_kmers=lambda wc: expand(rules.count_kmers.output, sm=wc.sm, hap="mat"),
         pat_kmers=lambda wc: expand(rules.count_kmers.output, sm=wc.sm, hap="pat"),
     output:
-        mat_db=join("results", "meryl", "{sm}", "mat_compress.k30.hapmer.meryl"),
-        pat_db=join("results", "meryl", "{sm}", "pat_compress.k30.hapmer.meryl"),
+        mat_db=join("results", "meryl", "{sm}", "mat_compress.hapmer.meryl"),
+        pat_db=join("results", "meryl", "{sm}", "pat_compress.hapmer.meryl"),
     conda:
         "../envs/verkko.yaml"
     shell:
