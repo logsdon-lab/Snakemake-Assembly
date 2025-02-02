@@ -39,7 +39,7 @@ rule symlink_data:
         .get(str(wc.dtype), {})
         .get("path", []),
     output:
-        directory(join("data", "{dtype}", "{sm}_link")),
+        directory(join("data", "{dtype}", "{sm}_link/")),
     log:
         "logs/symlink_data_{dtype}_{sm}.log",
     shell:

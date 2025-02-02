@@ -1,4 +1,4 @@
-from os.path import join
+from os.path import join, dirname
 from typing import NamedTuple
 from collections import defaultdict
 from enum import Enum
