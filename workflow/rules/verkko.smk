@@ -7,7 +7,7 @@ rule count_kmers:
     output:
         mer_db=directory(join("results", "meryl", "{sm}", "{hap}_compress.meryl")),
     resources:
-        mem="30GB",
+        mem=lambda wc: config["samples"][str(wc.sm)]["mem"] // 2,
     threads: lambda wc: config["samples"][str(wc.sm)]["threads"] // 2
     log:
         join("logs", "meryl", "{sm}", "{hap}_count_kmers.log")
