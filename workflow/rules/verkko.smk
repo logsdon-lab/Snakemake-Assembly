@@ -7,18 +7,20 @@ rule count_kmers:
     output:
         mer_db=directory(join("results", "meryl", "{sm}", "{hap}_compress.meryl")),
     resources:
-        mem=lambda wc: config["samples"][str(wc.sm)]["mem"] // 2,
+        mem=lambda wc: get_dtype_config(wc.sm, f"illumina_{wc.hap}").get("mem", "30GB"),
     threads: lambda wc: config["samples"][str(wc.sm)]["threads"] // 2
     log:
-        join("logs", "meryl", "{sm}", "{hap}_count_kmers.log")
+        join("logs", "meryl", "{sm}", "{hap}_count_kmers.log"),
     benchmark:
         join("benchmarks", "meryl", "{sm}", "{hap}_count_kmers.tsv")
     params:
-        fq_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), f"illumina_{wc.hap}"), opt="-name"),
-        kmer_size=lambda wc: config["samples"][str(wc.sm)]["data"][
-            f"illumina_{wc.hap}"
-        ].get("kmer_size", 30),
-        mem=lambda wc, resources: str(resources.mem).replace("GB", "")
+        fq_glob=lambda wc: multi_flags(
+            *dtype_glob(str(wc.sm), f"illumina_{wc.hap}"), opt="-name"
+        ),
+        kmer_size=lambda wc: get_dtype_config(wc.sm, f"illumina_{wc.hap}").get(
+            "kmer_size", 30
+        ),
+        mem=lambda wc, resources: str(resources.mem).replace("GB", ""),
     conda:
         "../envs/verkko.yaml"
     shell:
@@ -40,11 +42,11 @@ rule generate_hapmers:
         mat_db=directory(join("results", "meryl", "{sm}", "mat_compress.only.meryl")),
         pat_db=directory(join("results", "meryl", "{sm}", "pat_compress.only.meryl")),
     log:
-        join("logs", "meryl", "{sm}", "generate_hapmers.log")
+        join("logs", "meryl", "{sm}", "generate_hapmers.log"),
     benchmark:
         join("benchmarks", "meryl", "{sm}", "generate_hapmers.tsv")
     params:
-        output_dir=lambda wc, output: dirname(output.mat_db)
+        output_dir=lambda wc, output: dirname(output.mat_db),
     conda:
         "../envs/verkko.yaml"
     shell:
@@ -99,7 +101,7 @@ rule run_verkko:
         --hifi $(find {input.hifi_dir}/ {params.hifi_glob}) \
         --nano $(find {input.ont_dir}/ {params.ont_glob}) \
         {params.phasing_data_args} \
-        {params.snakeopts}
+        {params.snakeopts} &> {log}
         """
 
 
