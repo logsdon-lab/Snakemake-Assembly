@@ -4,3 +4,5 @@ channels:
 dependencies:
   - verkko==2.2.1
   - merqury==1.3
+  - seqtk==1.4
+  - samtools==1.21

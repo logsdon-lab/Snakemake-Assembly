@@ -2,6 +2,7 @@
 include: "rules/common.smk"
 include: "rules/constants.smk"
 include: "rules/data.smk"
+include: "rules/summarize.smk"
 include: "rules/hifiasm.smk"
 include: "rules/verkko.smk"
 
@@ -10,7 +11,7 @@ outputs = []
 for sm in SAMPLES:
     assembler = config["samples"][sm]["assembler"]
     output_glob = (
-        rules.run_verkko.output if assembler == "verkko" else rules.run_hifiasm.output
+        rules.verkko_all.input if assembler == "verkko" else rules.run_hifiasm.output
     )
     outputs.append(expand(output_glob, sm=sm))
 
