@@ -1,7 +1,7 @@
 samples:
   mPanTro3:
     threads: 40
-    assembler: hifiasm
+    assembler: verkko
     mem: 250GB
     data:
       ont:

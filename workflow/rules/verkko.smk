@@ -76,18 +76,33 @@ rule generate_hapmers:
         """
 
 
+# TODO: Make assembly a wildcard.
 def phasing_data_verkko(wc):
     if "illumina_mat" in DATA_DIRS[wc.sm] and "illumina_pat" in DATA_DIRS[wc.sm]:
         return {"hap_kmers": expand(rules.generate_hapmers.output, sm=wc.sm)}
+    elif "hic_mat" in DATA_DIRS[wc.sm] and "hic_pat" in DATA_DIRS[wc.sm]:
+        return {
+            "mat_hic_dir": DATA_DIRS[wc.sm]["hic_mat"],
+            "pat_hic_dir": DATA_DIRS[wc.sm]["hic_pat"],
+        }
     else:
-        return {}
+        raise ValueError("Not implemented or missing phasing data.")
 
 
 def phasing_data_verkko_args(wc, inputs):
     if "hap_kmers" in inputs.keys():
         return f"--hap-kmers {inputs.hap_kmers} trio"
+    elif "mat_hic_dir" in inputs.keys() and "pat_hic_dir" in inputs.keys():
+        # Construct find command.
+        mat_find_cmd = find_sep_command(
+            wc.sm, "hic_mat", inputs.mat_hic_dir[0], sep=" "
+        )
+        pat_find_cmd = find_sep_command(
+            wc.sm, "hic_pat", inputs.pat_hic_dir[0], sep=" "
+        )
+        return f"--hic1 $({mat_find_cmd}) --hic2 $({pat_find_cmd})"
     else:
-        return ""
+        raise ValueError("Not implemented or missing phasing data.")
 
 
 rule run_verkko:

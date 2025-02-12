@@ -46,16 +46,14 @@ def phasing_data_hifiasm_args(wc, inputs):
     if "mat_kmers" in inputs.keys() and "pat_kmers" in inputs.keys():
         return f"-1 {inputs.mat_kmers} -2 {inputs.pat_kmers}"
     elif "mat_hic_dir" in inputs.keys() and "pat_hic_dir" in inputs.keys():
-        # Generate find command.
-        mat_dir = os.path.abspath(inputs.mat_hic_dir[0])
-        pat_dir = os.path.abspath(inputs.pat_hic_dir[0])
-        # Get the data type globs in the config
-        mat_find_flags = multi_flags(*dtype_glob(str(wc.sm), "hic_mat"), opt="-name")
-        pat_find_flags = multi_flags(*dtype_glob(str(wc.sm), "hic_pat"), opt="-name")
         # Construct find command.
-        mat_find_cmd = f"$(find {mat_dir}/ {mat_find_flags} | paste -sd ',')"
-        pat_find_cmd = f"$(find {pat_dir}/ {pat_find_flags} | paste -sd ',')"
-        return f"--h1 {mat_find_cmd} --h2 {pat_find_cmd}"
+        mat_find_cmd = find_sep_command(
+            wc.sm, "hic_mat", inputs.mat_hic_dir[0], sep=","
+        )
+        pat_find_cmd = find_sep_command(
+            wc.sm, "hic_pat", inputs.pat_hic_dir[0], sep=","
+        )
+        return f"--h1 $({mat_find_cmd}) --h2 $({pat_find_cmd})"
     else:
         raise ValueError("Not implemented or missing phasing data.")
 
