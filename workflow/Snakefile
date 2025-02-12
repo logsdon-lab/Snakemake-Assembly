@@ -11,7 +11,7 @@ outputs = []
 for sm in SAMPLES:
     assembler = config["samples"][sm]["assembler"]
     output_glob = (
-        rules.verkko_all.input if assembler == "verkko" else rules.run_hifiasm.output
+        rules.verkko_all.input if assembler == "verkko" else rules.hifiasm_all.input
     )
     outputs.append(expand(output_glob, sm=sm))
 

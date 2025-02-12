@@ -1,26 +1,4 @@
 samples:
-  J1:
-    threads: 40
-    assembler: verkko
-    mem: 250GB
-    data:
-      ont:
-        path: /project/logsdon_shared/data/clinical/J1/raw_data/nanopore/STD/fastq/
-        include: ["*pass.fastq.gz"]
-      hifi:
-        path: /project/logsdon_shared/data/clinical/J3/raw_data/PacBio_HiFi/
-        include: ["*.hifi_reads.fastq.gz"]
-  J2:
-    threads: 40
-    assembler: verkko
-    mem: 250GB
-    data:
-      ont:
-        path: /project/logsdon_shared/data/clinical/J2/raw_data/nanopore/STD/fastq/
-        include: ["*pass.fastq.gz"]
-      hifi:
-        path: /project/logsdon_shared/data/clinical/J3/raw_data/PacBio_HiFi/
-        include: ["*.hifi_reads.fastq.gz"]
   J3:
     threads: 40
     assembler: verkko

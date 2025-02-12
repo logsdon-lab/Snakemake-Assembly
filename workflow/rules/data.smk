@@ -1,7 +1,8 @@
 class DataType(Enum):
     ONT = "ont"
     HIFI = "hifi"
-    HIC = "hic"
+    HIC_MAT = "hic_mat"
+    HIC_PAT = "hic_pat"
     ILLUMINA_MAT = "illumina_mat"
     ILLUMINA_PAT = "illumina_pat"
 

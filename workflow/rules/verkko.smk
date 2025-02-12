@@ -21,7 +21,7 @@ rule compress_homopolymers:
         """
 
 
-rule count_kmers:
+rule count_kmers_meryl:
     input:
         hpc_reads=rules.compress_homopolymers.output,
     output:
@@ -53,8 +53,8 @@ rule count_kmers:
 
 rule generate_hapmers:
     input:
-        mat_kmers=lambda wc: expand(rules.count_kmers.output, sm=wc.sm, hap="mat"),
-        pat_kmers=lambda wc: expand(rules.count_kmers.output, sm=wc.sm, hap="pat"),
+        mat_kmers=lambda wc: expand(rules.count_kmers_meryl.output, sm=wc.sm, hap="mat"),
+        pat_kmers=lambda wc: expand(rules.count_kmers_meryl.output, sm=wc.sm, hap="pat"),
     output:
         mat_db=directory(join("results", "meryl", "{sm}", "mat_compress.only.meryl")),
         pat_db=directory(join("results", "meryl", "{sm}", "pat_compress.only.meryl")),
@@ -76,14 +76,14 @@ rule generate_hapmers:
         """
 
 
-def phasing_data(wc):
+def phasing_data_verkko(wc):
     if "illumina_mat" in DATA_DIRS[wc.sm] and "illumina_pat" in DATA_DIRS[wc.sm]:
         return {"hap_kmers": expand(rules.generate_hapmers.output, sm=wc.sm)}
     else:
         return {}
 
 
-def phasing_data_args(wc, inputs):
+def phasing_data_verkko_args(wc, inputs):
     if "hap_kmers" in inputs.keys():
         return f"--hap-kmers {inputs.hap_kmers} trio"
     else:
@@ -93,7 +93,7 @@ def phasing_data_args(wc, inputs):
 rule run_verkko:
     input:
         # TODO: hic
-        unpack(phasing_data),
+        unpack(phasing_data_verkko),
         ont_dir=lambda wc: DATA_DIRS[wc.sm]["ont"],
         hifi_dir=lambda wc: DATA_DIRS[wc.sm]["hifi"],
     output:
@@ -111,9 +111,12 @@ rule run_verkko:
         output_dir=lambda wc, output: dirname(output[0]),
         ont_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "ont"), opt="-name"),
         hifi_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "hifi"), opt="-name"),
-        phasing_data_args=lambda wc, input: phasing_data_args(wc, input),
-        snakeopts=lambda wc: "--snakeopts "
-        + config["samples"][str(wc.sm)].get("snakeopts", ""),
+        phasing_data_args=lambda wc, input: phasing_data_verkko_args(wc, input),
+        snakeopts=lambda wc: (
+            f'--snakeopts {config["samples"][str(wc.sm)]["snakeopts"]}'
+            if config["samples"][str(wc.sm)].get("snakeopts")
+            else ""
+        ),
     shell:
         """
         verkko -d {params.output_dir} \

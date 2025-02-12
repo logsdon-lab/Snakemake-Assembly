@@ -12,6 +12,3 @@ samples:
         uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/pacbio_hifi/
         include: ["*.hifi_reads.fq.gz"]
         exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
-      hic:
-        uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/dovetail/
-        include: ["*.fastq.gz"]

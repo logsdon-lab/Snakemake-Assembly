@@ -1,38 +1,74 @@
-# rule count_kmers:
-#     input:
+rule count_kmers_yak:
+    input:
+        illumina_dir=lambda wc: DATA_DIRS[wc.sm][f"illumina_{wc.hap}"],
+    output:
+        kmers=join("results", "yak", "{sm}", "{hap}.yak"),
+    params:
+        fq_glob=lambda wc: multi_flags(
+            *dtype_glob(str(wc.sm), f"illumina_{wc.hap}"), opt="-name"
+        ),
+        kmer_size=lambda wc: config["samples"][str(wc.sm)]["data"][
+            f"illumina_{wc.hap}"
+        ].get("kmer_size", 31),
+        bloom_filter_size=37,
+    log:
+        join("logs", "yak", "{sm}", "{hap}_count_kmers_yak.log"),
+    threads: lambda wc: config["samples"][str(wc.sm)]["threads"] // 2
+    resources:
+        mem=lambda wc: config["samples"][str(wc.sm)]["mem"] // 2,
+    shell:
+        """
+        yak count \
+        -k {params.kmer_size} \
+        -b {params.bloom_filter_size} \
+        -t {threads} \
+        -o {output.kmers} \
+        <(find {input.illumina_dir}/ {params.fq_glob} -size +0 -exec zcat -f {{}} +) 2> {log}
+        """
 
-#     output:
-#         "{hap}.yak"
-#     params:
-#         kmer_size="",
-#     shell:
-#         """
-#         # For paired end provide, two identical streams.
-#         yak count -b37 -t16 -o pat.yak <(cat pat_1.fq.gz pat_2.fq.gz) <(cat pat_1.fq.gz pat_2.fq.gz)
-#         """
 
-# def strand_data(wc):
-#     if "illumina_mat" in DATA_DIRS[wc.sm] and "illumina_pat" in DATA_DIRS[wc.sm]:
-#         return {"hap_kmers": expand(rules.generate_hapmers.output, sm=wc.sm)}
-#     else:
-#         return {}
+def phasing_data_hifiasm(wc):
+    if "illumina_mat" in DATA_DIRS[wc.sm] and "illumina_pat" in DATA_DIRS[wc.sm]:
+        return {
+            "mat_kmers": expand(rules.count_kmers_yak.output, sm=wc.sm, hap="mat"),
+            "pat_kmers": expand(rules.count_kmers_yak.output, sm=wc.sm, hap="pat"),
+        }
+    elif "hic_mat" in DATA_DIRS[wc.sm] and "hic_pat" in DATA_DIRS[wc.sm]:
+        return {
+            "mat_hic_dir": DATA_DIRS[wc.sm]["hic_mat"],
+            "pat_hic_dir": DATA_DIRS[wc.sm]["hic_pat"],
+        }
+    else:
+        raise ValueError("Not implemented or missing phasing data.")
 
 
-# def strand_data_args(wc, inputs):
-#     if "hap_kmers" in inputs.keys():
-#         return f"--hap-kmers {inputs.hap_kmers} trio"
-#     else:
-#         return ""
+def phasing_data_hifiasm_args(wc, inputs):
+    if "mat_kmers" in inputs.keys() and "pat_kmers" in inputs.keys():
+        return f"-1 {inputs.mat_kmers} -2 {inputs.pat_kmers}"
+    elif "mat_hic_dir" in inputs.keys() and "pat_hic_dir" in inputs.keys():
+        # Generate find command.
+        mat_dir = os.path.abspath(inputs.mat_hic_dir[0])
+        pat_dir = os.path.abspath(inputs.pat_hic_dir[0])
+        # Get the data type globs in the config
+        mat_find_flags = multi_flags(*dtype_glob(str(wc.sm), "hic_mat"), opt="-name")
+        pat_find_flags = multi_flags(*dtype_glob(str(wc.sm), "hic_pat"), opt="-name")
+        # Construct find command.
+        mat_find_cmd = f"$(find {mat_dir}/ {mat_find_flags} | paste -sd ',')"
+        pat_find_cmd = f"$(find {pat_dir}/ {pat_find_flags} | paste -sd ',')"
+        return f"--h1 {mat_find_cmd} --h2 {pat_find_cmd}"
+    else:
+        raise ValueError("Not implemented or missing phasing data.")
 
 
 rule run_hifiasm:
     input:
-        # TODO: trios
-        hic_dir=lambda wc: DATA_DIRS[wc.sm]["hic"],
+        unpack(phasing_data_hifiasm),
         ont_dir=lambda wc: DATA_DIRS[wc.sm]["ont"],
         hifi_dir=lambda wc: DATA_DIRS[wc.sm]["hifi"],
     output:
-        directory(join("results", "hifiasm", "{sm}")),
+        # GFA name changes based on phasing data so cannot get path.
+        # Don't use output directory as will delete directory if fail.
+        touch(join("results", "hifiasm", "{sm}.done")),
     conda:
         "../envs/hifiasm.yaml"
     threads: lambda wc: config["samples"][str(wc.sm)]["threads"]
@@ -44,23 +80,19 @@ rule run_hifiasm:
     benchmark:
         "benchmarks/run_hifiasm_{sm}.tsv"
     params:
-        # TODO: Split into hic1 and hic2 in config.
-        hic_h1_rgx=".*R1.*fastq.gz",
-        hic_h2_rgx=".*R2.*fastq.gz",
-        hic_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "hic"), opt="-name"),
+        output_dir=lambda wc, output: dirname(output[0]),
         ont_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "ont"), opt="-name"),
         hifi_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "hifi"), opt="-name"),
+        phasing_data_args=lambda wc, input: phasing_data_hifiasm_args(wc, input),
     shell:
         """
         logpath=$(realpath {log})
-        hic_dir=$(realpath {input.hic_dir})
         ont_dir=$(realpath {input.ont_dir})
         hifi_dir=$(realpath {input.hifi_dir})
-        mkdir -p {output} && cd {output}
+        mkdir -p {params.output_dir} && cd {params.output_dir}
         hifiasm \
         -o "{wildcards.sm}" \
-        --h1 $(find ${{hic_dir}} {params.hic_glob} | grep -P {params.hic_h1_rgx} | paste -sd ",") \
-        --h2 $(find ${{hic_dir}} {params.hic_glob} | grep -P {params.hic_h2_rgx} | paste -sd ",") \
+        {params.phasing_data_args} \
         --ul $(find ${{ont_dir}} {params.ont_glob} | paste -sd ",") \
         -t {threads} \
         $(find ${{hifi_dir}} {params.hifi_glob} | paste -sd " ") 2> "${{logpath}}"
@@ -74,3 +106,9 @@ rule run_hifiasm:
 #         """
 #         awk '/^S/{{print ">"$2;print $3}}'
 #         """
+
+
+rule hifiasm_all:
+    input:
+        rules.run_hifiasm.output,
+        # rules.generate_summary_stats_verkko.output,

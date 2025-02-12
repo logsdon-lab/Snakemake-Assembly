@@ -1,0 +1,21 @@
+samples:
+  J3:
+    threads: 40
+    assembler: hifiasm
+    mem: 250GB
+    data:
+      ont:
+        path: /project/logsdon_shared/data/clinical/J3/raw_data/nanopore/STD/fastq/
+        # sup no hac
+        include: ["*sup-grid_fastq_pass.fastq.gz"]
+      hifi:
+        path: /project/logsdon_shared/data/clinical/J3/raw_data/PacBio_HiFi/
+        include: ["*.hifi_reads.fastq.gz"]
+      illumina_mat:
+        path: /project/logsdon_shared/data/clinical/J1/raw_data/illumina
+        kmer_size: 30
+        include: ["*.fastq"]
+      illumina_pat:
+        path: /project/logsdon_shared/data/clinical/J2/raw_data/illumina
+        kmer_size: 30
+        include: ["*.fastq"]
