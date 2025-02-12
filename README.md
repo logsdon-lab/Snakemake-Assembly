@@ -35,7 +35,9 @@ See `workflow/envs/(verkko|hifiasm).yaml` for version information.
 #### Types
 The following data types are supported for `{sm}.data.{dtype}`.
 * `"ont"`
+  * **Required**
 * `"hifi"`
+  * **Required**
 * `"hic_mat"`
 * `"hic_pat"`
 * `"illumina_mat"`
@@ -63,7 +65,7 @@ samples:
         # Include files to use.
         include: ["*.fq.gz"]
         # Exclude files.
-        include: ["*fail.fq.gz"]
+        exclude: ["*fail.fq.gz"]
       hifi:
         path: /project/logsdon_shared/data/PrimateT2T/hifi_data/mPanTro3
         include: ["*.hifi_reads.fq.gz"]

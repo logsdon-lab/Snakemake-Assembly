@@ -150,7 +150,7 @@ use rule generate_summary_stats as generate_summary_stats_verkko with:
     output:
         summary=join("results", "verkko", "{sm}", "assembly_stats.tsv"),
     log:
-        "logs/generate_summary_stats_{sm}.log",
+        "logs/generate_summary_stats_{sm}_verkko.log",
 
 
 rule verkko_all:

@@ -58,7 +58,7 @@ def phasing_data_hifiasm_args(wc, inputs):
         raise ValueError("Not implemented or missing phasing data.")
 
 
-rule run_hifiasm:
+checkpoint run_hifiasm:
     input:
         unpack(phasing_data_hifiasm),
         ont_dir=lambda wc: DATA_DIRS[wc.sm]["ont"],
@@ -99,16 +99,45 @@ rule run_hifiasm:
         """
 
 
-# rule convert_gfa_to_fa:
-#     input:
-#     output:
-#     shell:
-#         """
-#         awk '/^S/{{print ">"$2;print $3}}'
-#         """
+rule convert_gfa_to_fa:
+    input:
+        join("results", "hifiasm", "{sm}", "{sm}.{mdata}.p_ctg.gfa"),
+    output:
+        join("results", "hifiasm", "{sm}", "{sm}.{mdata}.p_ctg.fa"),
+    log:
+        "logs/convert_gfa_to_fa_{sm}_{mdata}.log",
+    conda:
+        "../envs/hifiasm.yaml"
+    shell:
+        """
+        awk '/^S/{{ print ">"$2; print $3 }}' > {output} 2> {log}
+        """
+
+
+def primary_contigs(wc):
+    chkpt = checkpoints.run_hifiasm.get(**wc).output[0]
+    output_dir = dirname(chkpt)
+    # Only look at primary contigs
+    # https://hifiasm.readthedocs.io/en/latest/interpreting-output.html#interpreting-output
+    wcs = glob_wildcards(join(output_dir, f"{wc.sm}.{{mdata}}.p_ctg.gfa"))
+    mdata = wcs.mdata
+
+    wildcard_constraints:
+        mdata="|".join(mdata),
+
+    return expand(rules.convert_gfa_to_fa.output, sm=wc.sm, mdata=mdata)
+
+
+use rule generate_summary_stats as generate_summary_stats_hifiasm with:
+    input:
+        fa=primary_contigs,
+    output:
+        summary=join("results", "hifiasm", "{sm}", "assembly_stats.tsv"),
+    log:
+        "logs/generate_summary_stats_{sm}_hifiasm.log",
 
 
 rule hifiasm_all:
     input:
         rules.run_hifiasm.output,
-        # rules.generate_summary_stats_verkko.output,
+        rules.generate_summary_stats_hifiasm.output,
