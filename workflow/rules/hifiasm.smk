@@ -27,7 +27,7 @@ rule count_kmers_yak:
         """
 
 
-def phasing_data_hifiasm(wc):
+def phasing_data_hifiasm(wc) -> dict[str, Any]:
     if "illumina_mat" in DATA_DIRS[wc.sm] and "illumina_pat" in DATA_DIRS[wc.sm]:
         return {
             "mat_kmers": expand(rules.count_kmers_yak.output, sm=wc.sm, hap="mat"),
@@ -39,10 +39,10 @@ def phasing_data_hifiasm(wc):
             "pat_hic_dir": DATA_DIRS[wc.sm]["hic_pat"],
         }
     else:
-        raise ValueError("Not implemented or missing phasing data.")
+        return {}
 
 
-def phasing_data_hifiasm_args(wc, inputs):
+def phasing_data_hifiasm_args(wc, inputs) -> str:
     if "mat_kmers" in inputs.keys() and "pat_kmers" in inputs.keys():
         return f"-1 {inputs.mat_kmers} -2 {inputs.pat_kmers}"
     elif "mat_hic_dir" in inputs.keys() and "pat_hic_dir" in inputs.keys():
@@ -55,7 +55,7 @@ def phasing_data_hifiasm_args(wc, inputs):
         )
         return f"--h1 $({mat_find_cmd}) --h2 $({pat_find_cmd})"
     else:
-        raise ValueError("Not implemented or missing phasing data.")
+        return ""
 
 
 checkpoint run_hifiasm:
@@ -110,7 +110,7 @@ rule convert_gfa_to_fa:
         "../envs/hifiasm.yaml"
     shell:
         """
-        awk '/^S/{{ print ">"$2; print $3 }}' > {output} 2> {log}
+        awk '/^S/{{ print ">"$2; print $3 }}' {input} > {output} 2> {log}
         """
 
 

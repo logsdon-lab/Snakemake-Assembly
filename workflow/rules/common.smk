@@ -1,5 +1,5 @@
 from os.path import join, dirname
-from typing import NamedTuple
+from typing import NamedTuple, Any
 from collections import defaultdict
 from enum import Enum
 

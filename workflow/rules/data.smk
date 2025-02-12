@@ -9,6 +9,7 @@ class DataType(Enum):
 
 rule aws_sync:
     output:
+        # NOTE: This will delete files on failed runs. Probably better way to trigger reruns.
         directory(join("data", "{dtype}", "{sm}")),
     params:
         uri=lambda wc: get_data_config(str(wc.sm)).get(str(wc.dtype), {}).get("uri"),
