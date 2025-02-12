@@ -61,8 +61,9 @@ samples:
       ont:
         path: /project/logsdon_shared/data/PrimateT2T/ont/mPanTro3
         # Include files to use.
-        # Exclude not currently supported.
         include: ["*.fq.gz"]
+        # Exclude files.
+        include: ["*fail.fq.gz"]
       hifi:
         path: /project/logsdon_shared/data/PrimateT2T/hifi_data/mPanTro3
         include: ["*.hifi_reads.fq.gz"]

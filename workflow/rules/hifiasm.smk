@@ -5,7 +5,7 @@ rule count_kmers_yak:
         kmers=join("results", "yak", "{sm}", "{hap}.yak"),
     params:
         fq_glob=lambda wc: multi_flags(
-            *dtype_glob(str(wc.sm), f"illumina_{wc.hap}"), opt="-name"
+            *dtype_glob(str(wc.sm), f"illumina_{wc.hap}"), pre_opt="-name"
         ),
         kmer_size=lambda wc: config["samples"][str(wc.sm)]["data"][
             f"illumina_{wc.hap}"
@@ -79,8 +79,10 @@ rule run_hifiasm:
         "benchmarks/run_hifiasm_{sm}.tsv"
     params:
         output_dir=lambda wc, output: dirname(output[0]),
-        ont_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "ont"), opt="-name"),
-        hifi_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "hifi"), opt="-name"),
+        ont_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "ont"), pre_opt="-name"),
+        hifi_glob=lambda wc: multi_flags(
+            *dtype_glob(str(wc.sm), "hifi"), pre_opt="-name"
+        ),
         phasing_data_args=lambda wc, input: phasing_data_hifiasm_args(wc, input),
     shell:
         """

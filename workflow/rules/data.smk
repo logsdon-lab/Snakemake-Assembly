@@ -14,11 +14,11 @@ rule aws_sync:
         uri=lambda wc: get_data_config(str(wc.sm)).get(str(wc.dtype), {}).get("uri"),
         include=lambda wc: multi_flags(
             *get_dtype_config(str(wc.sm), str(wc.dtype)).get("include", []),
-            opt="--include",
+            pre_opt="--include",
         ),
         exclude=lambda wc: multi_flags(
             *get_dtype_config(str(wc.sm), str(wc.dtype)).get("exclude", []),
-            opt="--exclude",
+            pre_opt="--exclude",
         ),
     threads: 1
     log:

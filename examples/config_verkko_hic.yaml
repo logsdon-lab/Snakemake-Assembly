@@ -12,7 +12,7 @@ samples:
         include: ["*.hifi_reads.fq.gz"]
       hic_mat:
         path: /project/logsdon_shared/data/PrimateT2T/dovetail_hic/mPanTro3
-        include: ["*.R1*fastq.gz"]
+        include: ["*R1*fastq.gz"]
       hic_pat:
         path: /project/logsdon_shared/data/PrimateT2T/dovetail_hic/mPanTro3
-        include: ["*.R2*fastq.gz"]
+        include: ["*R2*fastq.gz"]

@@ -12,20 +12,23 @@ def get_dtype_config(sm: str, dtype: str) -> dict:
     return get_data_config(sm).get(dtype, {})
 
 
-def multi_flags(*vals, opt: str) -> str:
-    return " ".join(f"{opt} {val}" for val in vals)
+def multi_flags(*vals, pre_opt: str, post_opt: str = "") -> str:
+    return " ".join(f"{pre_opt} {val} {post_opt}" for val in vals)
 
 
-def dtype_glob(
-    sm: str, dtype: str, *, which: str = "include", default=None
-) -> list[str]:
-    if not default:
-        default = ["*.fastq.gz"]
-    return get_dtype_config(sm, dtype).get(which, default)
+def dtype_glob(sm: str, dtype: str, *, which: str = "include") -> list[str]:
+    return get_dtype_config(sm, dtype).get(which, [])
 
 
-# TODO: exclude https://stackoverflow.com/a/4210072
 def find_sep_command(sm: str, dtype: str, indir: str, *, sep: str = " ") -> str:
     indir = mat_dir = os.path.abspath(indir)
-    include_flags = multi_flags(*dtype_glob(sm, dtype, which="include"), opt="-name")
-    return f"find {indir}/ {include_flags} | paste -sd '{sep}'"
+    include_flags = multi_flags(
+        *dtype_glob(sm, dtype, which="include"), pre_opt="-name"
+    )
+    # https://stackoverflow.com/a/4210072
+    exclude_flags = multi_flags(
+        *dtype_glob(sm, dtype, which="exclude"),
+        pre_opt=r"-not \( -name",
+        post_opt=r"-prune \)",
+    )
+    return f"find {indir}/ {include_flags} {exclude_flags} | paste -sd '{sep}'"

@@ -7,7 +7,7 @@ rule compress_homopolymers:
         hpc_reads=join("results", "meryl", "{sm}", "{hap}_hpc.fastq.gz"),
     params:
         fq_glob=lambda wc: multi_flags(
-            *dtype_glob(str(wc.sm), f"illumina_{wc.hap}"), opt="-name"
+            *dtype_glob(str(wc.sm), f"illumina_{wc.hap}"), pre_opt="-name"
         ),
     log:
         join("logs", "meryl", "{sm}", "{hap}_compress_homopolymers.log"),
@@ -124,8 +124,10 @@ rule run_verkko:
         "benchmarks/run_verkko_{sm}.tsv"
     params:
         output_dir=lambda wc, output: dirname(output[0]),
-        ont_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "ont"), opt="-name"),
-        hifi_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "hifi"), opt="-name"),
+        ont_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "ont"), pre_opt="-name"),
+        hifi_glob=lambda wc: multi_flags(
+            *dtype_glob(str(wc.sm), "hifi"), pre_opt="-name"
+        ),
         phasing_data_args=lambda wc, input: phasing_data_verkko_args(wc, input),
         snakeopts=lambda wc: (
             f'--snakeopts {config["samples"][str(wc.sm)]["snakeopts"]}'
