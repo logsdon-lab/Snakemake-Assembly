@@ -109,8 +109,8 @@ rule run_verkko:
     input:
         # TODO: hic
         unpack(phasing_data_verkko),
-        ont_dir=lambda wc: DATA_DIRS[wc.sm]["ont"],
-        hifi_dir=lambda wc: DATA_DIRS[wc.sm]["hifi"],
+        ont_fofn=expand(rules.generate_dtype_fofn.output, asm="verkko", dtype="ont", sm="{sm}"),
+        hifi_fofn=expand(rules.generate_dtype_fofn.output, asm="verkko", dtype="hifi", sm="{sm}"),
     output:
         join("results", "verkko", "{sm}", "assembly.fasta"),
     conda:
@@ -124,10 +124,6 @@ rule run_verkko:
         "benchmarks/run_verkko_{sm}.tsv"
     params:
         output_dir=lambda wc, output: dirname(output[0]),
-        ont_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "ont"), pre_opt="-name"),
-        hifi_glob=lambda wc: multi_flags(
-            *dtype_glob(str(wc.sm), "hifi"), pre_opt="-name"
-        ),
         phasing_data_args=lambda wc, input: phasing_data_verkko_args(wc, input),
         snakeopts=lambda wc: (
             f'--snakeopts {config["samples"][str(wc.sm)]["snakeopts"]}'
@@ -137,8 +133,8 @@ rule run_verkko:
     shell:
         """
         verkko -d {params.output_dir} \
-        --hifi $(find {input.hifi_dir}/ {params.hifi_glob}) \
-        --nano $(find {input.ont_dir}/ {params.ont_glob}) \
+        --hifi $(cat {input.hifi_fofn}) \
+        --nano $(cat {input.ont_fofn}) \
         {params.phasing_data_args} \
         {params.snakeopts} &> {log}
         """

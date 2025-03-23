@@ -61,8 +61,8 @@ def phasing_data_hifiasm_args(wc, inputs) -> str:
 checkpoint run_hifiasm:
     input:
         unpack(phasing_data_hifiasm),
-        ont_dir=lambda wc: DATA_DIRS[wc.sm]["ont"],
-        hifi_dir=lambda wc: DATA_DIRS[wc.sm]["hifi"],
+        ont_fofn=expand(rules.generate_dtype_fofn.output, asm="hifiasm", dtype="ont", sm="{sm}"),
+        hifi_fofn=expand(rules.generate_dtype_fofn.output, asm="hifiasm", dtype="hifi", sm="{sm}"),
     output:
         # GFA name changes based on phasing data so cannot get path.
         # Don't use output directory as will delete directory if fail.
@@ -79,23 +79,17 @@ checkpoint run_hifiasm:
         "benchmarks/run_hifiasm_{sm}.tsv"
     params:
         output_dir=lambda wc, output: dirname(output[0]),
-        ont_glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), "ont"), pre_opt="-name"),
-        hifi_glob=lambda wc: multi_flags(
-            *dtype_glob(str(wc.sm), "hifi"), pre_opt="-name"
-        ),
         phasing_data_args=lambda wc, input: phasing_data_hifiasm_args(wc, input),
     shell:
         """
         logpath=$(realpath {log})
-        ont_dir=$(realpath {input.ont_dir})
-        hifi_dir=$(realpath {input.hifi_dir})
         mkdir -p {params.output_dir} && cd {params.output_dir}
         hifiasm \
         -o "{wildcards.sm}" \
         {params.phasing_data_args} \
-        --ul $(find ${{ont_dir}} {params.ont_glob} | paste -sd ",") \
+        --ul $(cat {input.ont_fofn} | paste -sd ",") \
         -t {threads} \
-        $(find ${{hifi_dir}} {params.hifi_glob} | paste -sd " ") 2> "${{logpath}}"
+        $(cat {input.hifi_fofn} | paste -sd " ") 2> "${{logpath}}"
         """
 
 

@@ -61,3 +61,53 @@ def get_data_dirs() -> list:
 
 # Global state.
 DATA_DIRS = get_data_dirs()
+
+
+checkpoint generate_original_dtype_fofn:
+    input:
+        dtype_dir=lambda wc: DATA_DIRS[wc.sm][wc.dtype]
+    output:
+        fofn=join("results", "{asm}", "{sm}_{dtype}_original.fofn")
+    params:
+        glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), wc.dtype), pre_opt="-name"),
+    shell:
+        """
+        find {input.dtype_dir}/ {params.glob} > {output.fofn}
+        """
+
+
+def check_for_bams(wc):
+    fofn=checkpoints.generate_original_dtype_fofn.get(**wc).output
+    all_files = []
+    with open(fofn[0], "rt") as fh:
+        for file in fh.readlines():
+            indir, fname = split(file.strip())
+            if fname.endswith(".bam"):
+                bname, ext = splitext(fname)
+                new_fname = join(indir, bname)
+                all_files.append(expand(rules.convert_bam_to_fastq.output, fname=new_fname))
+            else:
+                all_files.append(file)
+    return all_files
+
+
+rule convert_bam_to_fastq:
+    input:
+        bam="{fname}.bam"
+    output:
+        fastq="{fname}.fastq.gz"
+    threads: 8
+    shell:
+        """
+        samtools bam2fq --threads {threads} {input.bam} | bgzip > {output.fastq}
+        """
+
+rule generate_dtype_fofn:
+    input:
+        unpack(check_for_bams)
+    output:
+        join("results", "{asm}", "{sm}_{dtype}_final.fofn")
+    shell:
+        """
+        cat {input} > {output}
+        """
