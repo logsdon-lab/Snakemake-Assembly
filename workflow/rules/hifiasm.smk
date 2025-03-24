@@ -87,9 +87,9 @@ checkpoint run_hifiasm:
         hifiasm \
         -o "{wildcards.sm}" \
         {params.phasing_data_args} \
-        --ul $(cat {input.ont_fofn} | paste -sd ",") \
+        --ul $(paste -sd "," {input.ont_fofn}) \
         -t {threads} \
-        $(cat {input.hifi_fofn} | paste -sd " ") 2> "${{logpath}}"
+        $(paste -sd " " input.hifi_fofn}) 2> "${{logpath}}"
         """
 
 

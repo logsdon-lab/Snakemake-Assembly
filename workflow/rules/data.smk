@@ -90,16 +90,17 @@ def check_for_bams(wc):
                 all_files.append(file)
     return all_files
 
-
+# Issue with gzip so uncompressed.
+# https://github.com/marbl/verkko/issues/320
 rule convert_bam_to_fastq:
     input:
         bam="{fname}.bam"
     output:
-        fastq="{fname}.fastq.gz"
+        fastq="{fname}.fastq"
     threads: 8
     shell:
         """
-        samtools bam2fq --threads {threads} {input.bam} | bgzip > {output.fastq}
+        samtools bam2fq --threads {threads} {input.bam} > {output.fastq}
         """
 
 rule generate_dtype_fofn:
