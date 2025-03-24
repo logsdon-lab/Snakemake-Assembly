@@ -109,5 +109,5 @@ rule generate_dtype_fofn:
         join("results", "{asm}", "{sm}_{dtype}_final.fofn")
     shell:
         """
-        cat {input} > {output}
+        ls {input} > {output}
         """
