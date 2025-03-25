@@ -83,13 +83,15 @@ checkpoint run_hifiasm:
     shell:
         """
         logpath=$(realpath {log})
+        ont_fofn_path=$(realpath {input.ont_fofn})
+        hifi_fofn_path=$(realpath {input.hifi_fofn})
         mkdir -p {params.output_dir} && cd {params.output_dir}
         hifiasm \
         -o "{wildcards.sm}" \
         {params.phasing_data_args} \
-        --ul $(paste -sd "," {input.ont_fofn}) \
+        --ul $(paste -sd "," "${{ont_fofn_path}}") \
         -t {threads} \
-        $(paste -sd " " input.hifi_fofn}) 2> "${{logpath}}"
+        $(paste -sd " " "${{hifi_fofn_path}}") 2> "${{logpath}}"
         """
 
 
