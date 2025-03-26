@@ -78,7 +78,7 @@ checkpoint run_hifiasm:
     benchmark:
         "benchmarks/run_hifiasm_{sm}.tsv"
     params:
-        output_dir=lambda wc, output: dirname(output[0]),
+        output_dir=lambda wc, output: splitext(output[0])[0],
         phasing_data_args=lambda wc, input: phasing_data_hifiasm_args(wc, input),
     shell:
         """
@@ -99,20 +99,22 @@ rule convert_gfa_to_fa:
     input:
         join("results", "hifiasm", "{sm}", "{sm}.{mdata}.p_ctg.gfa"),
     output:
-        join("results", "hifiasm", "{sm}", "{sm}.{mdata}.p_ctg.fa"),
+        fa=join("results", "hifiasm", "{sm}", "{sm}.{mdata}.p_ctg.fa"),
+        fai=join("results", "hifiasm", "{sm}", "{sm}.{mdata}.p_ctg.fa.fai"),
     log:
         "logs/convert_gfa_to_fa_{sm}_{mdata}.log",
     conda:
         "../envs/hifiasm.yaml"
     shell:
         """
-        awk '/^S/{{ print ">"$2; print $3 }}' {input} > {output} 2> {log}
+        awk '/^S/{{ print ">"$2; print $3 }}' {input} > {output.fa} 2> {log}
+        samtools faidx {output.fa}
         """
 
 
 def primary_contigs(wc):
     chkpt = checkpoints.run_hifiasm.get(**wc).output[0]
-    output_dir = dirname(chkpt)
+    output_dir = splitext(chkpt)[0]
     # Only look at primary contigs
     # https://hifiasm.readthedocs.io/en/latest/interpreting-output.html#interpreting-output
     wcs = glob_wildcards(join(output_dir, f"{wc.sm}.{{mdata}}.p_ctg.gfa"))
@@ -121,7 +123,7 @@ def primary_contigs(wc):
     wildcard_constraints:
         mdata="|".join(mdata),
 
-    return expand(rules.convert_gfa_to_fa.output, sm=wc.sm, mdata=mdata)
+    return expand(rules.convert_gfa_to_fa.output.fa, sm=wc.sm, mdata=mdata)
 
 
 use rule generate_summary_stats as generate_summary_stats_hifiasm with:

@@ -4,3 +4,4 @@ channels:
 dependencies:
   - yak==0.1
   - hifiasm==0.25.0
+  - samtools==1.21
