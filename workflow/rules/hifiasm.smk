@@ -95,7 +95,7 @@ checkpoint run_hifiasm:
         """
 
 
-rule convert_gfa_to_fa:
+checkpoint convert_gfa_to_fa:
     input:
         join("results", "hifiasm", "{sm}", "{sm}.{mdata}.p_ctg.gfa"),
     output:
@@ -108,7 +108,7 @@ rule convert_gfa_to_fa:
     shell:
         """
         awk '/^S/{{ print ">"$2; print $3 }}' {input} > {output.fa} 2> {log}
-        samtools faidx {output.fa}
+        samtools faidx {output.fa} 2>> {log}
         """
 
 
@@ -126,9 +126,39 @@ def primary_contigs(wc):
     return expand(rules.convert_gfa_to_fa.output.fa, sm=wc.sm, mdata=mdata)
 
 
+def hap_contigs(wc):
+    chkpt = checkpoints.run_hifiasm.get(**wc).output[0]
+    output_dir = splitext(chkpt)[0]
+    # Only look at primary contigs
+    # https://hifiasm.readthedocs.io/en/latest/interpreting-output.html#interpreting-output
+    wcs = glob_wildcards(join(output_dir, f"{wc.sm}.{{mdata}}.p_ctg.gfa"))
+
+    return [
+        checkpoints.convert_gfa_to_fa.get(**wc, mdata=mdata).output.fa
+        for mdata in wcs.mdata
+        if "hap1" in mdata or "hap2" in mdata
+    ]
+
+
+rule merge_haps:
+    input:
+        fa=hap_contigs
+    output:
+        fa=join("results", "hifiasm", "{sm}", "assembly.fasta"),
+    log:
+        "logs/merge_haps_{sm}.log",
+    conda:
+        "../envs/hifiasm.yaml"
+    shell:
+        """
+        cat {input.fa} > {output.fa}
+        samtools faidx {output.fa} 2> {log}
+        """
+
+
 use rule generate_summary_stats as generate_summary_stats_hifiasm with:
     input:
-        fa=primary_contigs,
+        fa=lambda wc: [*primary_contigs(wc), *expand(rules.merge_haps.output, sm=wc.sm)],
     output:
         summary=join("results", "hifiasm", "{sm}", "assembly_stats.tsv"),
     log:
@@ -138,4 +168,5 @@ use rule generate_summary_stats as generate_summary_stats_hifiasm with:
 rule hifiasm_all:
     input:
         rules.run_hifiasm.output,
+        rules.merge_haps.output,
         rules.generate_summary_stats_hifiasm.output,
