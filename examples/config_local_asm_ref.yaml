@@ -1,0 +1,20 @@
+samples:
+  mPanTro3:
+    threads: 40
+    mem: 250GB
+    assembler: hifiasm
+    data:
+      ont:
+        path: /project/logsdon_shared/data/PrimateT2T/ont/mPanTro3
+        include: ["*.fq.gz"]
+      hifi:
+        path: /project/logsdon_shared/data/PrimateT2T/hifi_data/mPanTro3
+        include: ["*.hifi_reads.fq.gz"]
+
+asm_to_ref:
+  ref:
+    CHM13: /project/logsdon_shared/projects/twins_chrY_assembly/data/reference/T2T-CHM13v2.fasta
+  mm2_opts: "-x asm20 --secondary=no -s 25000 -K 8G"
+  threads: 32
+  mem: 250GB
+  mode: ["saffire", "ideogram"]

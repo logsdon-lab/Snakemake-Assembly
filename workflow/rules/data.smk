@@ -35,7 +35,7 @@ rule aws_sync:
         """
 
 
-def get_data_dirs() -> list:
+def get_data_dirs() -> defaultdict[str, defaultdict[str, list[str]]]:
     outputs = defaultdict(lambda: defaultdict(list))
     for sm, sm_settings in config["samples"].items():
         for dtype, settings in sm_settings["data"].items():
@@ -65,9 +65,9 @@ DATA_DIRS = get_data_dirs()
 
 checkpoint generate_original_dtype_fofn:
     input:
-        dtype_dir=lambda wc: DATA_DIRS[wc.sm][wc.dtype]
+        dtype_dir=lambda wc: DATA_DIRS[wc.sm][wc.dtype],
     output:
-        fofn=join("results", "{asm}", "{sm}_{dtype}_original.fofn")
+        fofn=join("results", "{asm}", "{sm}_{dtype}_original.fofn"),
     params:
         glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), wc.dtype), pre_opt="-name"),
     shell:
@@ -77,7 +77,7 @@ checkpoint generate_original_dtype_fofn:
 
 
 def check_for_bams(wc):
-    fofn=checkpoints.generate_original_dtype_fofn.get(**wc).output
+    fofn = checkpoints.generate_original_dtype_fofn.get(**wc).output
     all_files = []
     with open(fofn[0], "rt") as fh:
         for file in fh.readlines():
@@ -85,29 +85,33 @@ def check_for_bams(wc):
             if fname.endswith(".bam"):
                 bname, ext = splitext(fname)
                 new_fname = join(indir, bname)
-                all_files.append(expand(rules.convert_bam_to_fastq.output, fname=new_fname))
+                all_files.append(
+                    expand(rules.convert_bam_to_fastq.output, fname=new_fname)
+                )
             else:
                 all_files.append(file)
     return all_files
+
 
 # Issue with gzip so uncompressed.
 # https://github.com/marbl/verkko/issues/320
 rule convert_bam_to_fastq:
     input:
-        bam="{fname}.bam"
+        bam="{fname}.bam",
     output:
-        fastq="{fname}.fastq"
+        fastq="{fname}.fastq",
     threads: 8
     shell:
         """
         samtools bam2fq --threads {threads} {input.bam} > {output.fastq}
         """
 
+
 rule generate_dtype_fofn:
     input:
-        unpack(check_for_bams)
+        unpack(check_for_bams),
     output:
-        join("results", "{asm}", "{sm}_{dtype}_final.fofn")
+        join("results", "{asm}", "{sm}_{dtype}_final.fofn"),
     shell:
         """
         ls {input} > {output}

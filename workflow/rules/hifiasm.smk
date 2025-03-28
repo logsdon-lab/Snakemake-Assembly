@@ -61,8 +61,12 @@ def phasing_data_hifiasm_args(wc, inputs) -> str:
 checkpoint run_hifiasm:
     input:
         unpack(phasing_data_hifiasm),
-        ont_fofn=expand(rules.generate_dtype_fofn.output, asm="hifiasm", dtype="ont", sm="{sm}"),
-        hifi_fofn=expand(rules.generate_dtype_fofn.output, asm="hifiasm", dtype="hifi", sm="{sm}"),
+        ont_fofn=expand(
+            rules.generate_dtype_fofn.output, asm="hifiasm", dtype="ont", sm="{sm}"
+        ),
+        hifi_fofn=expand(
+            rules.generate_dtype_fofn.output, asm="hifiasm", dtype="hifi", sm="{sm}"
+        ),
     output:
         # GFA name changes based on phasing data so cannot get path.
         # Don't use output directory as will delete directory if fail.
@@ -140,13 +144,13 @@ def hap_contigs(wc):
     ]
 
 
-rule merge_haps:
+rule merge_haps_hifiasm:
     input:
-        fa=hap_contigs
+        fa=hap_contigs,
     output:
         fa=join("results", "hifiasm", "{sm}", "assembly.fasta"),
     log:
-        "logs/merge_haps_{sm}.log",
+        "logs/merge_haps_hifiasm_{sm}.log",
     conda:
         "../envs/hifiasm.yaml"
     shell:
@@ -158,7 +162,10 @@ rule merge_haps:
 
 use rule generate_summary_stats as generate_summary_stats_hifiasm with:
     input:
-        fa=lambda wc: [*primary_contigs(wc), *expand(rules.merge_haps.output, sm=wc.sm)],
+        fa=lambda wc: [
+            *primary_contigs(wc),
+            *expand(rules.merge_haps_hifiasm.output, sm=wc.sm),
+        ],
     output:
         summary=join("results", "hifiasm", "{sm}", "assembly_stats.tsv"),
     log:
@@ -168,5 +175,5 @@ use rule generate_summary_stats as generate_summary_stats_hifiasm with:
 rule hifiasm_all:
     input:
         rules.run_hifiasm.output,
-        rules.merge_haps.output,
+        rules.merge_haps_hifiasm.output,
         rules.generate_summary_stats_hifiasm.output,

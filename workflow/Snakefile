@@ -13,7 +13,12 @@ for sm in SAMPLES:
     output_glob = (
         rules.verkko_all.input if assembler == "verkko" else rules.hifiasm_all.input
     )
-    outputs.append(expand(output_glob, sm=sm))
+    outputs.extend(expand(output_glob, sm=sm))
+
+# Check for additional analyses.
+if config.get("asm_to_ref"):
+
+    include: "rules/asm_to_ref.smk"
 
 
 rule all:

@@ -91,5 +91,33 @@ samples:
         exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
 ```
 
+### Analyses
+Additional analyses can be added:
+
+#### asm_to_ref
+Align assembly to a reference genome.
+
+```yaml
+asm_to_ref:
+  ref:
+    CHM13: /project/logsdon_shared/projects/twins_chrY_assembly/data/reference/T2T-CHM13v2.fasta
+  mm2_opts: "-x asm20 --secondary=no -s 25000 -K 8G"
+  threads: 32
+  mem: 250GB
+  mode: ["saffire", "ideogram"]
+```
+
+One or more modes is possible.
+
+##### Ideogram
+Generate an ideogram of the assembly.
+
+##### SafFire
+Generate [`SafFire`](https://github.com/mrvollger/SafFire) beds.
+
+#### NucFlag
+> [!NOTE]
+> TODO
+
 ### Examples
 For more examples, see the `examples/` directory.
