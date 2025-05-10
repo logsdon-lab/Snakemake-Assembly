@@ -46,15 +46,15 @@ def phasing_data_hifiasm(wc) -> dict[str, Any]:
 
 def phasing_data_hifiasm_args(wc, inputs) -> str:
     if "mat_kmers" in inputs.keys() and "pat_kmers" in inputs.keys():
-        return f"-1 {inputs.mat_kmers} -2 {inputs.pat_kmers}"
+        mat_kmers = abspath(inputs.mat_kmers[0])
+        pat_kmers = abspath(inputs.pat_kmers[0])
+        return f"-1 {mat_kmers} -2 {pat_kmers}"
     elif "mat_hic_dir" in inputs.keys() and "pat_hic_dir" in inputs.keys():
+        mat_hic_dir = abspath(inputs.mat_hic_dir[0])
+        pat_hic_dir = abspath(inputs.pat_hic_dir[0])
         # Construct find command.
-        mat_find_cmd = find_sep_command(
-            wc.sm, "hic_mat", inputs.mat_hic_dir[0], sep=","
-        )
-        pat_find_cmd = find_sep_command(
-            wc.sm, "hic_pat", inputs.pat_hic_dir[0], sep=","
-        )
+        mat_find_cmd = find_sep_command(wc.sm, "hic_mat", mat_hic_dir, sep=",")
+        pat_find_cmd = find_sep_command(wc.sm, "hic_pat", pat_hic_dir, sep=",")
         return f"--h1 $({mat_find_cmd}) --h2 $({pat_find_cmd})"
     else:
         return ""
@@ -63,14 +63,17 @@ def phasing_data_hifiasm_args(wc, inputs) -> str:
 def input_hifiasm_args(wc, inputs) -> str:
     args = []
     if inputs["ont_fofn"] and not inputs["hifi_fofn"]:
+        ont_fofn = abspath(inputs.ont_fofn[0])
         # ONT only assembly.
         # https://github.com/chhylp123/hifiasm?tab=readme-ov-file#assembling-ont-reads
         args.append("--ont")
-        args.append(f'$(paste -sd " " $(realpath {inputs.ont_fofn}))')
+        args.append(f'$(paste -sd " " {ont_fofn})')
     elif inputs["ont_fofn"]:
-        args.append(f'--ul $(paste -sd "," $(realpath {inputs.ont_fofn}))')
+        ont_fofn = abspath(inputs.ont_fofn[0])
+        args.append(f'--ul $(paste -sd "," {ont_fofn})')
     if inputs["hifi_fofn"]:
-        args.append(f'$(paste -sd " " $(realpath {inputs.hifi_fofn}))')
+        hifi_fofn = abspath(inputs.hifi_fofn[0])
+        args.append(f'$(paste -sd " " {hifi_fofn})')
     args_str = " ".join(args)
     if not args_str:
         raise ValueError(f"Require at least ont or hifi data for {wc.sm}.")
@@ -106,7 +109,7 @@ checkpoint run_hifiasm:
         mem=lambda wc: config["samples"][str(wc.sm)]["mem"],
         lsf_extra=lambda wc: "-M " + config["samples"][str(wc.sm)]["mem"],
     log:
-        "logs/run_hifiasm_{sm}.log",
+        abspath("logs/run_hifiasm_{sm}.log"),
     benchmark:
         "benchmarks/run_hifiasm_{sm}.tsv"
     params:
@@ -116,14 +119,13 @@ checkpoint run_hifiasm:
         input_args=lambda wc, input: input_hifiasm_args(wc, input),
     shell:
         """
-        logpath=$(realpath {log})
         mkdir -p {params.output_dir} && cd {params.output_dir}
         hifiasm \
         -t {threads} \
         -o "{wildcards.sm}" \
         {params.phasing_data_args} \
         {params.input_args} \
-        {params.added_args} 2> "${{logpath}}"
+        {params.added_args} 2> {log}
         """
 
 

@@ -1,4 +1,4 @@
-from os.path import join, dirname, split, splitext, basename
+from os.path import join, dirname, split, splitext, basename, abspath
 from typing import NamedTuple, Any
 from collections import defaultdict
 from enum import Enum
