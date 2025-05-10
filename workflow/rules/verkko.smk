@@ -141,9 +141,9 @@ rule run_verkko:
         output_dir=lambda wc, output: dirname(output[0]),
         phasing_data_args=lambda wc, input: phasing_data_verkko_args(wc, input),
         input_args=lambda wc, input: input_verkko_args(wc, input),
-        snakeopts=lambda wc: (
-            f'--snakeopts {config["samples"][str(wc.sm)]["snakeopts"]}'
-            if config["samples"][str(wc.sm)].get("snakeopts")
+        added_args=lambda wc: (
+            f'--snakeopts {config["samples"][str(wc.sm)]["added_args"]}'
+            if config["samples"][str(wc.sm)].get("added_args")
             else ""
         ),
     shell:
@@ -151,7 +151,7 @@ rule run_verkko:
         verkko -d {params.output_dir} \
         {params.input_args} \
         {params.phasing_data_args} \
-        {params.snakeopts} &> {log}
+        {params.added_args} &> {log}
         """
 
 

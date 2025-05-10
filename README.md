@@ -30,14 +30,25 @@ Either:
 
 See `workflow/envs/(verkko|hifiasm).yaml` for version information.
 
+To pass additional args to either assembler, use the `added_args` option.
+
+```yaml
+samples:
+  sample_name:
+    threads: 32
+    mem: 200GB
+    assembler: verkko
+    added_args: -k
+    data: ...
+```
+
 ### Data
 
 #### Types
 The following data types are supported for `{sm}.data.{dtype}`.
 * `"ont"`
-  * **Required**
 * `"hifi"`
-  * **Required**
+  * **Required** for `verkko`.
 * `"hic_mat"`
 * `"hic_pat"`
 * `"illumina_mat"`

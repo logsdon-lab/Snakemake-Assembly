@@ -11,6 +11,8 @@ rule count_kmers_yak:
             f"illumina_{wc.hap}"
         ].get("kmer_size", 31),
         bloom_filter_size=37,
+    conda:
+        "../envs/hifiasm.yaml"
     log:
         join("logs", "yak", "{sm}", "{hap}_count_kmers_yak.log"),
     threads: lambda wc: config["samples"][str(wc.sm)]["threads"] // 2
@@ -108,6 +110,7 @@ checkpoint run_hifiasm:
     benchmark:
         "benchmarks/run_hifiasm_{sm}.tsv"
     params:
+        added_args=lambda wc: config["samples"][str(wc.sm)].get("added_args", ""),
         output_dir=lambda wc, output: splitext(output[0])[0],
         phasing_data_args=lambda wc, input: phasing_data_hifiasm_args(wc, input),
         input_args=lambda wc, input: input_hifiasm_args(wc, input),
@@ -119,7 +122,8 @@ checkpoint run_hifiasm:
         -t {threads} \
         -o "{wildcards.sm}" \
         {params.phasing_data_args} \
-        {params.input_args} 2> "${{logpath}}"
+        {params.input_args} \
+        {params.added_args} 2> "${{logpath}}"
         """
 
 
