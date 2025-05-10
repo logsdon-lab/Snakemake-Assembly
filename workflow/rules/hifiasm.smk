@@ -15,7 +15,7 @@ rule count_kmers_yak:
         join("logs", "yak", "{sm}", "{hap}_count_kmers_yak.log"),
     threads: lambda wc: config["samples"][str(wc.sm)]["threads"] // 2
     resources:
-        mem=lambda wc: config["samples"][str(wc.sm)]["mem"] // 2,
+        mem=lambda wc: config["samples"][str(wc.sm)]["mem"],
     shell:
         """
         yak count \
@@ -58,14 +58,40 @@ def phasing_data_hifiasm_args(wc, inputs) -> str:
         return ""
 
 
+def input_hifiasm_args(wc, inputs) -> str:
+    args = []
+    if inputs["ont_fofn"] and not inputs["hifi_fofn"]:
+        # ONT only assembly.
+        # https://github.com/chhylp123/hifiasm?tab=readme-ov-file#assembling-ont-reads
+        args.append("--ont")
+        args.append(f'$(paste -sd " " $(realpath {inputs.ont_fofn}))')
+    elif inputs["ont_fofn"]:
+        args.append(f'--ul $(paste -sd "," $(realpath {inputs.ont_fofn}))')
+    if inputs["hifi_fofn"]:
+        args.append(f'$(paste -sd " " $(realpath {inputs.hifi_fofn}))')
+    args_str = " ".join(args)
+    if not args_str:
+        raise ValueError(f"Require at least ont or hifi data for {wc.sm}.")
+
+    return args_str
+
+
 checkpoint run_hifiasm:
     input:
         unpack(phasing_data_hifiasm),
-        ont_fofn=expand(
-            rules.generate_dtype_fofn.output, asm="hifiasm", dtype="ont", sm="{sm}"
+        ont_fofn=lambda wc: (
+            expand(
+                rules.generate_dtype_fofn.output, asm="hifiasm", dtype="ont", sm=wc.sm
+            )
+            if config["samples"][str(wc.sm)]["data"].get("ont")
+            else []
         ),
-        hifi_fofn=expand(
-            rules.generate_dtype_fofn.output, asm="hifiasm", dtype="hifi", sm="{sm}"
+        hifi_fofn=lambda wc: (
+            expand(
+                rules.generate_dtype_fofn.output, asm="hifiasm", dtype="hifi", sm=wc.sm
+            )
+            if config["samples"][str(wc.sm)]["data"].get("hifi")
+            else []
         ),
     output:
         # GFA name changes based on phasing data so cannot get path.
@@ -84,18 +110,16 @@ checkpoint run_hifiasm:
     params:
         output_dir=lambda wc, output: splitext(output[0])[0],
         phasing_data_args=lambda wc, input: phasing_data_hifiasm_args(wc, input),
+        input_args=lambda wc, input: input_hifiasm_args(wc, input),
     shell:
         """
         logpath=$(realpath {log})
-        ont_fofn_path=$(realpath {input.ont_fofn})
-        hifi_fofn_path=$(realpath {input.hifi_fofn})
         mkdir -p {params.output_dir} && cd {params.output_dir}
         hifiasm \
+        -t {threads} \
         -o "{wildcards.sm}" \
         {params.phasing_data_args} \
-        --ul $(paste -sd "," "${{ont_fofn_path}}") \
-        -t {threads} \
-        $(paste -sd " " "${{hifi_fofn_path}}") 2> "${{logpath}}"
+        {params.input_args} 2> "${{logpath}}"
         """
 
 

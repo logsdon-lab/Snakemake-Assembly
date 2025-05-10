@@ -1,6 +1,6 @@
 .snakemake
 data
-logs
-benchmarks
-results
+logs*
+benchmarks*
+results*
 *.yaml

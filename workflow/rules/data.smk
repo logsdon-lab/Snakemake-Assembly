@@ -81,7 +81,8 @@ def check_for_bams(wc):
     all_files = []
     with open(fofn[0], "rt") as fh:
         for file in fh.readlines():
-            indir, fname = split(file.strip())
+            file = file.strip()
+            indir, fname = split(file)
             if fname.endswith(".bam"):
                 bname, ext = splitext(fname)
                 new_fname = join(indir, bname)
