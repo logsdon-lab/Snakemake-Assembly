@@ -1,0 +1,15 @@
+samples:
+  mPanTro3:
+    threads: 40
+    assembler: verkko
+    mem: 250GB
+    data:
+      hifi:
+        path: /project/logsdon_shared/data/PrimateT2T/hifi_data/mPanTro3
+        include: ["*.hifi_reads.fq.gz"]
+      hic_mat:
+        path: /project/logsdon_shared/data/PrimateT2T/dovetail_hic/mPanTro3
+        include: ["*R1*fastq.gz"]
+      hic_pat:
+        path: /project/logsdon_shared/data/PrimateT2T/dovetail_hic/mPanTro3
+        include: ["*R2*fastq.gz"]
