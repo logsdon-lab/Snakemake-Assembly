@@ -2,18 +2,13 @@
 include: "rules/common.smk"
 include: "rules/constants.smk"
 include: "rules/data.smk"
-include: "rules/summarize.smk"
-include: "rules/hifiasm.smk"
-include: "rules/verkko.smk"
+include: "rules/assembly.smk"
 
 
 outputs = []
 for sm in SAMPLES:
     assembler = config["samples"][sm]["assembler"]
-    output_glob = (
-        rules.verkko_all.input if assembler == "verkko" else rules.hifiasm_all.input
-    )
-    outputs.extend(expand(output_glob, sm=sm))
+    outputs.extend(expand(rules.asm_all.input, zip, sm=sm, asm=assembler))
 
 # Check for additional analyses.
 if config.get("asm_to_ref"):

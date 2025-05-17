@@ -3,11 +3,12 @@ ALN_CFG = {
     "sm": {
         sm: expand(
             (
-                rules.run_verkko.output
-                if assembler == "verkko"
-                else rules.merge_haps_hifiasm.output
+                rules.verkko_output.output
+                if config["samples"][sm]["assembler"] == "verkko"
+                else rules.hifiasm_output.output
             ),
             sm=sm,
+            asm=config["samples"][sm]["assembler"],
         )
         for sm in SAMPLES
     },
@@ -20,6 +21,7 @@ ALN_CFG = {
     "mm2_opts": config["asm_to_ref"].get(
         "mm2_opts", "-x asm20 --secondary=no -s 25000 -K 8G"
     ),
+    "ideogram_min": config["asm_to_ref"].get("ideogram_min", 1e6),
 }
 
 
