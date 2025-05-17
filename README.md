@@ -8,6 +8,11 @@ Need basic AWS and local path support.
 
 ## Usage
 ```bash
+git clone https://github.com/logsdon-lab/Snakemake-Assembly.git --recursive
+cd Snakemake-Assembly
+```
+
+```bash
 snakemake -np --use-conda --configfile config.yaml --workflow-profile none
 ```
 

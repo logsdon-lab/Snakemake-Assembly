@@ -27,11 +27,7 @@ ALN_CFG = {
 
 module asm_to_ref:
     snakefile:
-        github(
-            "koisland/asm-to-reference-alignment",
-            path="workflow/Snakefile",
-            branch="ideogram",
-        )
+        "asm-to-reference-alignment/workflow/Snakefile"
     config:
         ALN_CFG
 
