@@ -28,3 +28,4 @@ wildcard_constraints:
     sm="|".join(SAMPLES),
     hap="|".join(h.value for h in Haplotype),
     dtype="|".join(d.value for d in DataType),
+    mdata=r"[^\/]*",

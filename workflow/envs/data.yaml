@@ -1,4 +1,5 @@
 channels:
   - conda-forge
 dependencies:
-  - awscli
+  - awscli==2.27.23
+  - samtools==1.21

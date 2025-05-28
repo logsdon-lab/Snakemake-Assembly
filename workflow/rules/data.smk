@@ -19,7 +19,7 @@ rule aws_sync:
     benchmark:
         "benchmarks/download_{dtype}_{sm}.tsv"
     conda:
-        "../envs/aws.yaml"
+        "../envs/data.yaml"
     shell:
         """
         aws s3 --no-sign-request sync {params.uri} {output} \
@@ -94,9 +94,13 @@ rule convert_bam_to_fastq:
     output:
         fastq="{fname}.fastq",
     threads: 8
+    log:
+        "{fname}.to_fastq.log",
+    conda:
+        "../envs/data.yaml"
     shell:
         """
-        samtools bam2fq --threads {threads} {input.bam} > {output.fastq}
+        samtools bam2fq --threads {threads} {input.bam} > {output.fastq} 2> {log}
         """
 
 

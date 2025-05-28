@@ -159,9 +159,6 @@ def primary_contigs(wc):
     wcs = glob_wildcards(join(output_dir, f"{wc.sm}.{{mdata}}.p_ctg.gfa"))
     mdata = wcs.mdata
 
-    wildcard_constraints:
-        mdata="|".join(mdata),
-
     return expand(rules.convert_gfa_to_fa.output.fa, **wc, mdata=mdata)
 
 
