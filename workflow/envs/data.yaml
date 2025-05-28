@@ -1,5 +1,6 @@
 channels:
   - conda-forge
+  - bioconda
 dependencies:
   - awscli==2.27.23
   - samtools==1.21
