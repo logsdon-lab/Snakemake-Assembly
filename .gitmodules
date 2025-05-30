@@ -2,3 +2,8 @@
 	path = workflow/rules/asm-to-reference-alignment
 	url = https://github.com/koisland/asm-to-reference-alignment.git
 	branch = "ideogram"
+    ignore = dirty
+[submodule "workflow/rules/Snakemake-NucFlag"]
+	path = workflow/rules/Snakemake-NucFlag
+	url = https://github.com/logsdon-lab/Snakemake-NucFlag.git
+    ignore = dirty

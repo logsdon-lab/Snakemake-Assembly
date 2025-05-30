@@ -10,10 +10,16 @@ for sm in SAMPLES:
     assembler = config["samples"][sm]["assembler"]
     outputs.extend(expand(rules.asm_all.input, zip, sm=sm, asm=assembler))
 
+
 # Check for additional analyses.
 if config.get("asm_to_ref"):
 
     include: "rules/asm_to_ref.smk"
+
+
+if config.get("nucflag"):
+
+    include: "rules/nucflag.smk"
 
 
 rule all:

@@ -128,12 +128,50 @@ One or more modes is possible.
 ##### Ideogram
 Generate an ideogram of the assembly.
 
+> [!NOTE]
+> Reference only works with CHM13
+
+![](docs/ideogram.png)
+
+
 ##### SafFire
 Generate [`SafFire`](https://github.com/mrvollger/SafFire) beds.
 
+![](docs/saffire.png)
+
 #### NucFlag
+Run NucFlag on the entire assembly with provided hifi data.
+* https://github.com/logsdon-lab/Snakemake-NucFlag/tree/main
+
+![](docs/nucflag.png)
+
 > [!NOTE]
-> TODO
+> Currently incompatible with S3 hifi input.
+
+```yaml
+nucflag:
+  # samples: []
+  output_dir: "results/nucflag"
+  output_coverage: false
+  logs_dir: "logs/nucflag"
+  benchmarks_dir: "benchmarks/nucflag"
+  threads_aln: 8
+  mem_aln: 30G
+  processes_nucflag: 12
+  mem_nucflag: 50G
+  samtools_view_flag: 2308
+```
+
+If you need to align to reads not included in the assembly or use a different nucflag configfile, you can specify it per assembly like so:
+* Otherwise, uses/expects hifi data from assembly.
+```yaml
+nucflag:
+  samples:
+    - name: sample
+      config: "/path/to/nucflag.toml"
+      read_dir: /path/to/reads/
+      read_rgx: ".*\\.hifi_reads.fastq.gz$"
+```
 
 ### Examples
 For more examples, see the `examples/` directory.

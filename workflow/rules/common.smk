@@ -2,6 +2,7 @@ from os.path import join, dirname, split, splitext, basename, abspath
 from typing import NamedTuple, Any
 from collections import defaultdict
 from enum import Enum
+import subprocess
 
 
 def get_data_config(sm: str) -> dict:
@@ -20,7 +21,9 @@ def dtype_glob(sm: str, dtype: str, *, which: str = "include") -> list[str]:
     return get_dtype_config(sm, dtype).get(which, [])
 
 
-def find_sep_command(sm: str, dtype: str, indir: str, *, sep: str = " ") -> str:
+def find_sep_command(
+    sm: str, dtype: str, indir: str, *, sep: str = " ", with_paste: bool = True
+) -> str:
     indir = mat_dir = os.path.abspath(indir)
     include_flags = multi_flags(
         *dtype_glob(sm, dtype, which="include"), pre_opt="-name"
@@ -31,4 +34,7 @@ def find_sep_command(sm: str, dtype: str, indir: str, *, sep: str = " ") -> str:
         pre_opt=r"-not \( -name",
         post_opt=r"-prune \)",
     )
-    return f"find {indir}/ {include_flags} {exclude_flags} | paste -sd '{sep}'"
+    cmd = f"find {indir}/ {include_flags} {exclude_flags}"
+    if with_paste:
+        cmd += " | paste -sd '{sep}'"
+    return cmd
