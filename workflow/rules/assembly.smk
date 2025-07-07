@@ -169,10 +169,12 @@ def hap_contigs(wc):
     # https://hifiasm.readthedocs.io/en/latest/interpreting-output.html#interpreting-output
     wcs = glob_wildcards(join(output_dir, f"{wc.sm}.{{mdata}}.p_ctg.gfa"))
 
+    filtered_wcs = [mdata for mdata in wcs.mdata if "hap1" in mdata or "hap2" in mdata]
+    if not filtered_wcs:
+        filtered_wcs = wcs.mdata
     return [
         checkpoints.convert_gfa_to_fa.get(**wc, mdata=mdata).output.fa
-        for mdata in wcs.mdata
-        if "hap1" in mdata or "hap2" in mdata
+        for mdata in filtered_wcs
     ]
 
 
@@ -231,7 +233,44 @@ rule generate_summary_stats:
         """
 
 
+rule cleanup_tmp_fastq:
+    input:
+        asm=rules.run_assembler.output,
+        ont_fofn=lambda wc: (
+            expand(
+                rules.generate_dtype_fofn.output,
+                zip,
+                asm=wc.asm,
+                dtype="ont",
+                sm=wc.sm,
+            )
+            if config["samples"][str(wc.sm)]["data"].get("ont")
+            else []
+        ),
+        hifi_fofn=lambda wc: (
+            expand(
+                rules.generate_dtype_fofn.output,
+                zip,
+                asm=wc.asm,
+                dtype="hifi",
+                sm=wc.sm,
+            )
+            if config["samples"][str(wc.sm)]["data"].get("hifi")
+            else []
+        ),
+    output:
+        touch(join("results", "{asm}", "{sm}_cleanup_fastq.done")),
+    shell:
+        """
+        # Only remove files with suffix .tmp.fastq
+        # Make sure that none of your original files are named with this suffix! 
+        awk 'index($1, ".tmp.fastq")' {input.ont_fofn} | xargs rm
+        awk 'index($1, ".tmp.fastq")' {input.hifi_fofn} | xargs rm
+        """
+
+
 rule asm_all:
     input:
         rules.run_assembler.output,
+        rules.cleanup_tmp_fastq.output,
         rules.generate_summary_stats.output,

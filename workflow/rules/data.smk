@@ -92,7 +92,7 @@ rule convert_bam_to_fastq:
     input:
         bam="{fname}.bam",
     output:
-        fastq="{fname}.fastq",
+        fastq="{fname}.tmp.fastq",
     threads: 8
     log:
         "{fname}.to_fastq.log",
