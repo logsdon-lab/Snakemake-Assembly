@@ -81,6 +81,8 @@ def check_for_bams(wc):
                 all_files.append(
                     expand(rules.convert_bam_to_fastq.output, fname=new_fname)
                 )
+            elif fname.endswith(".tmp.fastq"):
+                raise ValueError(f"{fname} contains a reserved suffix (.tmp.fastq). Please change this to something else.")
             else:
                 all_files.append(file)
     return all_files

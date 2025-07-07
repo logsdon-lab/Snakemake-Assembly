@@ -59,9 +59,9 @@ The following data types are supported for `{sm}.data.{dtype}`.
 * `"illumina_mat"`
 * `"illumina_pat"`
 
-> [!WARNING]
+> [!NOTE]
 > This workflow makes large temporary files for ONT and HiFI data and cleans them up on workflow completion. 
-> It reserves the suffix, `.tmp.fastq` for this purpose. **Do not use this for any important source data or it will be deleted!**
+> It reserves the suffix, `.tmp.fastq` for this purpose and will error if any files provided contain it.
 
 #### Sources
 Data sources can be either local or on AWS:
