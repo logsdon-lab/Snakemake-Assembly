@@ -71,7 +71,7 @@ def input_args(wc, inputs) -> str:
 checkpoint run_assembler:
     input:
         unpack(phasing_data),
-        ont_fofn=lambda wc: (
+        ont_fofn=lambda wc: ancient(
             expand(
                 rules.generate_dtype_fofn.output,
                 zip,
@@ -82,7 +82,7 @@ checkpoint run_assembler:
             if config["samples"][str(wc.sm)]["data"].get("ont")
             else []
         ),
-        hifi_fofn=lambda wc: (
+        hifi_fofn=lambda wc: ancient(
             expand(
                 rules.generate_dtype_fofn.output,
                 zip,
@@ -263,7 +263,7 @@ rule cleanup_tmp_fastq:
     shell:
         """
         # Only remove files with suffix .tmp.fastq
-        # Make sure that none of your original files are named with this suffix! 
+        # Make sure that none of your original files are named with this suffix!
         awk 'index($1, ".tmp.fastq")' {input.ont_fofn} | xargs rm
         awk 'index($1, ".tmp.fastq")' {input.hifi_fofn} | xargs rm
         """
