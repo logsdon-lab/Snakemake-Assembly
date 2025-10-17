@@ -264,8 +264,8 @@ rule cleanup_tmp_fastq:
         """
         # Only remove files with suffix .tmp.fastq
         # Make sure that none of your original files are named with this suffix!
-        awk 'index($1, ".tmp.fastq")' {input.ont_fofn} | xargs rm
-        awk 'index($1, ".tmp.fastq")' {input.hifi_fofn} | xargs rm
+        awk 'index($1, ".tmp.fastq")' {input.ont_fofn} | xargs rm -f
+        awk 'index($1, ".tmp.fastq")' {input.hifi_fofn} | xargs rm -f
         """
 
 
