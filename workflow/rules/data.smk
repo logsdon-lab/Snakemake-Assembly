@@ -15,9 +15,9 @@ rule aws_sync:
         ),
     threads: 1
     log:
-        "logs/download_{dtype}_{sm}.log",
+        join(LOG_DIR, "download_{dtype}_{sm}.log"),
     benchmark:
-        "benchmarks/download_{dtype}_{sm}.tsv"
+        join(BENCHMARK_DIR, "download_{dtype}_{sm}.tsv")
     conda:
         "../envs/data.yaml"
     shell:
@@ -59,7 +59,7 @@ checkpoint generate_original_dtype_fofn:
     input:
         dtype_dir=lambda wc: DATA_DIRS[wc.sm][wc.dtype],
     output:
-        fofn=join("results", "{asm}", "{sm}_{dtype}_original.fofn"),
+        fofn=join(OUTPUT_DIR, "{asm}", "{sm}_{dtype}_original.fofn"),
     params:
         glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), wc.dtype), pre_opt="-name"),
     shell:
@@ -82,7 +82,9 @@ def check_for_bams(wc):
                     expand(rules.convert_bam_to_fastq.output, fname=new_fname)
                 )
             elif fname.endswith(".tmp.fastq"):
-                raise ValueError(f"{fname} contains a reserved suffix (.tmp.fastq). Please change this to something else.")
+                raise ValueError(
+                    f"{fname} contains a reserved suffix (.tmp.fastq). Please change this to something else."
+                )
             else:
                 all_files.append(file)
     return all_files
@@ -103,6 +105,8 @@ rule convert_bam_to_fastq:
     shell:
         """
         samtools bam2fq --threads {threads} {input.bam} > {output.fastq} 2> {log}
+        # Index file to ensure non-empty
+        samtools faidx {output.fastq} -o /dev/null
         """
 
 
@@ -110,7 +114,7 @@ rule generate_dtype_fofn:
     input:
         unpack(check_for_bams),
     output:
-        join("results", "{asm}", "{sm}_{dtype}_final.fofn"),
+        join(OUTPUT_DIR, "{asm}", "{sm}_{dtype}_final.fofn"),
     shell:
         """
         ls {input} > {output}

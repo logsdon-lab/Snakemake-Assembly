@@ -1,8 +1,9 @@
-from os.path import join, dirname, split, splitext, basename, abspath
+import subprocess
+
+from enum import Enum
 from typing import NamedTuple, Any
 from collections import defaultdict
-from enum import Enum
-import subprocess
+from os.path import join, dirname, split, splitext, basename, abspath
 
 
 def get_data_config(sm: str) -> dict:

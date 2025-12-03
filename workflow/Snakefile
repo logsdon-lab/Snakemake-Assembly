@@ -1,3 +1,11 @@
+from snakemake.utils import validate, min_version
+
+
+min_version("8.24")
+validate(config, "../config/config.schema.yaml")
+
+shell.prefix("set -euo pipefail;")
+
 
 include: "rules/common.smk"
 include: "rules/constants.smk"

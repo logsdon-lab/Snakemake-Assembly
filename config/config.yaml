@@ -1,3 +1,6 @@
+output_dir: "results"
+benchmark_dir: "benchmarks"
+log_dir: "logs"
 samples:
   mPanTro3:
     threads: 32
@@ -11,6 +14,9 @@ samples:
         uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/pacbio_hifi/
         include: ["*.hifi_reads.fq.gz"]
         exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
-      hic:
+      hic_mat:
         uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/dovetail/
-        include: ["*.fastq.gz"]
+        include: ["*R1*.fastq.gz"]
+      hic_pat:
+        uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/dovetail/
+        include: ["*R2*.fastq.gz"]

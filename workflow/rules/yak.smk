@@ -2,7 +2,7 @@ rule count_kmers_yak:
     input:
         illumina_dir=lambda wc: DATA_DIRS[wc.sm][f"illumina_{wc.hap}"],
     output:
-        kmers=join("results", "yak", "{sm}", "{hap}.yak"),
+        kmers=join(OUTPUT_DIR, "yak", "{sm}", "{hap}.yak"),
     params:
         fq_glob=lambda wc: multi_flags(
             *dtype_glob(str(wc.sm), f"illumina_{wc.hap}"), pre_opt="-name"
@@ -14,7 +14,7 @@ rule count_kmers_yak:
     conda:
         "../envs/hifiasm.yaml"
     log:
-        join("logs", "yak", "{sm}", "{hap}_count_kmers_yak.log"),
+        join(LOG_DIR, "yak", "{sm}", "{hap}_count_kmers_yak.log"),
     threads: lambda wc: config["samples"][str(wc.sm)]["threads"] // 2
     resources:
         mem=lambda wc: config["samples"][str(wc.sm)]["mem"],

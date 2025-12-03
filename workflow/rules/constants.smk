@@ -1,4 +1,7 @@
 SAMPLES = config["samples"].keys()
+OUTPUT_DIR = config["output_dir"]
+BENCHMARK_DIR = config["benchmark_dir"]
+LOG_DIR = config["log_dir"]
 
 
 class Haplotype(Enum):
@@ -18,9 +21,6 @@ class DataType(Enum):
     HIC_PAT = "hic_pat"
     ILLUMINA_MAT = "illumina_mat"
     ILLUMINA_PAT = "illumina_pat"
-
-
-DATA_DIR = join("data", "{dtype}", "{sm}")
 
 
 wildcard_constraints:

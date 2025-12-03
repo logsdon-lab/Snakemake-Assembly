@@ -1,0 +1,179 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+properties:
+  output_dir:
+    type: string
+    default: results
+  log_dir:
+    type: string
+    default: logs
+  benchmark_dir:
+    type: string
+    default: benchmarks
+  samples:
+    type: object
+    additional_properties: false
+    # TODO: this doesn't work
+    patternProperties:
+      # Generic regex.
+      ^.*$:
+        type: object
+        properties:
+          threads:
+            type: integer
+            default: 32
+          mem:
+            type: string
+            pattern: "\\d+GB"
+            default: 100GB
+          assembler:
+            type: string
+            enum: ["hifiasm", "verkko"]
+            default: hifiasm
+            description: Assembler to use.
+          data:
+            type: object
+            additional_properties: false
+            properties:
+              ont:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    description: Path to file.
+                  uri:
+                    type: string
+                    description: AWS uri.
+                  include:
+                    type: array
+                    items:
+                      type: string
+                    description: File glob to include file from path or uri.
+                  exclude:
+                    type: array
+                    items:
+                      type: string
+                    description: File glob to exclude file from path or uri.
+              hifi:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    description: Path to file.
+                  uri:
+                    type: string
+                    description: AWS uri.
+                  include:
+                    type: array
+                    items:
+                      type: string
+                    description: File glob to include file from path or uri.
+                  exclude:
+                    type: array
+                    items:
+                      type: string
+                    description: File glob to exclude file from path or uri.
+              hic_mat:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    description: Path to file.
+                  uri:
+                    type: string
+                    description: AWS uri.
+                  include:
+                    type: array
+                    items:
+                      type: string
+                    description: File glob to include file from path or uri.
+                  exclude:
+                    type: array
+                    items:
+                      type: string
+                    description: File glob to exclude file from path or uri.
+              hic_pat:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    description: Path to file.
+                  uri:
+                    type: string
+                    description: AWS uri.
+                  include:
+                    type: array
+                    items:
+                      type: string
+                    description: File glob to include file from path or uri.
+                  exclude:
+                    type: array
+                    items:
+                      type: string
+                    description: File glob to exclude file from path or uri.
+              illumina_mat:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    description: Path to file.
+                  uri:
+                    type: string
+                    description: AWS uri.
+                  include:
+                    type: array
+                    items:
+                      type: string
+                    description: File glob to include file from path or uri.
+                  exclude:
+                    type: array
+                    items:
+                      type: string
+                    description: File glob to exclude file from path or uri.
+                  kmer_size:
+                    type: integer
+                    description: kmer size for yak
+              illumina_pat:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    description: Path to file.
+                  uri:
+                    type: string
+                    description: AWS uri.
+                  include:
+                    type: array
+                    items:
+                      type: string
+                    description: File glob to include file from path or uri.
+                  exclude:
+                    type: array
+                    items:
+                      type: string
+                    description: File glob to exclude file from path or uri.
+                  kmer_size:
+                    type: integer
+                    description: kmer size for yak
+  asm_to_ref:
+    type: object
+    # properties:
+    #   ref:
+    #     CHM13: /project/logsdon_shared/projects/twins_chrY_assembly/data/reference/T2T-CHM13v2.fasta
+    #   mm2_opts: "-x asm20 --secondary=no -s 25000 -K 8G"
+    #   threads: 32
+    #   mem: 250GB
+    #   mode: ["saffire", "ideogram"]
+    #   ideogram_min: 1e5
+  nucflag:
+    type: object
+    # output_dir: "results/nucflag"
+    # output_coverage: false
+    # logs_dir: "logs/nucflag"
+    # benchmarks_dir: "benchmarks/nucflag"
+    # threads_aln: 8
+    # mem_aln: 30G
+    # processes_nucflag: 12
+    # mem_nucflag: 50G
+    # samtools_view_flag: 2308
+required:
+- samples

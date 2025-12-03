@@ -97,7 +97,7 @@ checkpoint run_assembler:
         # hifiasm:
         # GFA name changes based on phasing data so cannot get path.
         # Don't use output directory as will delete directory if fail.
-        touch(join("results", "{asm}", "{sm}.done")),
+        touch(join(OUTPUT_DIR, "{asm}", "{sm}.done")),
     conda:
         "../envs/{asm}.yaml"
     threads: lambda wc: config["samples"][str(wc.sm)]["threads"]
@@ -105,9 +105,9 @@ checkpoint run_assembler:
         mem=lambda wc: config["samples"][str(wc.sm)]["mem"],
         lsf_extra=lambda wc: "-M " + config["samples"][str(wc.sm)]["mem"],
     log:
-        abspath("logs/run_{asm}_{sm}.log"),
+        abspath(join(LOG_DIR, "run_{asm}_{sm}.log")),
     benchmark:
-        "benchmarks/run_{asm}_{sm}.tsv"
+        join(BENCHMARK_DIR, "run_{asm}_{sm}.tsv")
     params:
         added_args=lambda wc: config["samples"][str(wc.sm)].get("added_args", ""),
         output_dir=lambda wc, output: splitext(output[0])[0],
@@ -134,12 +134,12 @@ checkpoint run_assembler:
 
 checkpoint convert_gfa_to_fa:
     input:
-        join("results", "{asm}", "{sm}", "{sm}.{mdata}.p_ctg.gfa"),
+        join(OUTPUT_DIR, "{asm}", "{sm}", "{sm}.{mdata}.p_ctg.gfa"),
     output:
-        fa=join("results", "{asm}", "{sm}", "{sm}.{mdata}.p_ctg.fa"),
-        fai=join("results", "{asm}", "{sm}", "{sm}.{mdata}.p_ctg.fa.fai"),
+        fa=join(OUTPUT_DIR, "{asm}", "{sm}", "{sm}.{mdata}.p_ctg.fa"),
+        fai=join(OUTPUT_DIR, "{asm}", "{sm}", "{sm}.{mdata}.p_ctg.fa.fai"),
     log:
-        "logs/convert_gfa_to_fa_{asm}_{sm}_{mdata}.log",
+        join(LOG_DIR, "convert_gfa_to_fa_{asm}_{sm}_{mdata}.log"),
     wildcard_constraints:
         asm="hifiasm",
     conda:
@@ -182,9 +182,9 @@ rule hifiasm_output:
     input:
         fa=hap_contigs,
     output:
-        fa=join("results", "{asm}", "{sm}", "assembly.fasta"),
+        fa=join(OUTPUT_DIR, "{asm}", "{sm}", "assembly.fasta"),
     log:
-        "logs/merge_haps_{asm}_{sm}.log",
+        join(LOG_DIR, "merge_haps_{asm}_{sm}.log"),
     wildcard_constraints:
         asm="hifiasm",
     conda:
@@ -198,9 +198,9 @@ rule hifiasm_output:
 
 rule verkko_output:
     input:
-        join("results", "{asm}", "{sm}.done"),
+        join(OUTPUT_DIR, "{asm}", "{sm}.done"),
     output:
-        join("results", "{asm}", "{sm}", "assembly.fasta"),
+        join(OUTPUT_DIR, "{asm}", "{sm}", "assembly.fasta"),
     wildcard_constraints:
         asm="verkko",
 
@@ -219,9 +219,9 @@ rule generate_summary_stats:
     input:
         fa=asm_output,
     output:
-        summary=join("results", "{asm}", "{sm}", "assembly_stats.tsv"),
+        summary=join(OUTPUT_DIR, "{asm}", "{sm}", "assembly_stats.tsv"),
     log:
-        "logs/generate_summary_stats_{sm}_{asm}.log",
+        join(LOG_DIR, "generate_summary_stats_{sm}_{asm}.log"),
     params:
         script=workflow.source_path("../scripts/seq_stats.py"),
     threads: 1
@@ -259,7 +259,7 @@ rule cleanup_tmp_fastq:
             else []
         ),
     output:
-        touch(join("results", "{asm}", "{sm}_cleanup_fastq.done")),
+        touch(join(OUTPUT_DIR, "{asm}", "{sm}_cleanup_fastq.done")),
     shell:
         """
         # Only remove files with suffix .tmp.fastq
