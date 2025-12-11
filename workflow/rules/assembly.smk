@@ -183,6 +183,7 @@ rule hifiasm_output:
         fa=hap_contigs,
     output:
         fa=join(OUTPUT_DIR, "{asm}", "{sm}", "assembly.fasta"),
+        fai=join(OUTPUT_DIR, "{asm}", "{sm}", "assembly.fasta.fai"),
     log:
         join(LOG_DIR, "merge_haps_{asm}_{sm}.log"),
     wildcard_constraints:
@@ -200,18 +201,23 @@ rule verkko_output:
     input:
         join(OUTPUT_DIR, "{asm}", "{sm}.done"),
     output:
-        join(OUTPUT_DIR, "{asm}", "{sm}", "assembly.fasta"),
+        fa=join(OUTPUT_DIR, "{asm}", "{sm}", "assembly.fasta"),
+        fai=join(OUTPUT_DIR, "{asm}", "{sm}", "assembly.fasta.fai"),
     wildcard_constraints:
         asm="verkko",
+    shell:
+        """
+        samtools faidx {output.fa}
+        """
 
 
 def asm_output(wc):
     outputs = []
     if wc.asm == "verkko":
-        outputs.extend(expand(rules.verkko_output.output, sm=wc.sm, asm=wc.asm))
+        outputs.extend(expand(rules.verkko_output.output.fa, sm=wc.sm, asm=wc.asm))
     else:
         outputs.extend(primary_contigs(wc))
-        outputs.extend(expand(rules.hifiasm_output.output, sm=wc.sm, asm=wc.asm))
+        outputs.extend(expand(rules.hifiasm_output.output.fa, sm=wc.sm, asm=wc.asm))
     return outputs
 
 
