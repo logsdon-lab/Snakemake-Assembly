@@ -1,0 +1,16 @@
+samples:
+  mPanTro3:
+    threads: 32
+    mem: 250GB
+    assembler: hifiasm
+    # Dynamically set conda version so can test multiple assembly versions.
+    version: 0.25.1
+    data:
+      ont:
+        uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/ont/
+        include: ["*.fq.gz"]
+        exclude: ["*old-guppy-runs/*", "*.bam*", "*fast5/*"]
+      hifi:
+        uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/pacbio_hifi/
+        include: ["*.hifi_reads.fq.gz"]
+        exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]

@@ -1,3 +1,5 @@
+import os
+import yaml
 import subprocess
 
 from enum import Enum
@@ -39,3 +41,22 @@ def find_sep_command(
     if with_paste:
         cmd += " | paste -sd '{sep}'"
     return cmd
+
+
+# We want to be able to set version programmatically for testing multiple versions.
+def dynamic_assembler_conda_env(wc) -> str:
+    if not config["samples"][wc.sm].get("version"):
+        return f"workflow/envs/{wc.asm}.yaml"
+
+    version = config["samples"][wc.sm]["version"]
+    template_conda_env = f"workflow/envs/{wc.asm}_template.yaml"
+    output_conda_dir = join(OUTPUT_DIR, wc.asm, wc.sm)
+    output_conda_env = abspath(join(output_conda_dir, "env.yaml"))
+    os.makedirs(output_conda_dir, exist_ok=True)
+    with open(template_conda_env, "rb") as fh, open(output_conda_env, "wt") as ofh:
+        conda_env = yaml.safe_load(fh)
+        conda_env["dependencies"].remove(wc.asm)
+        conda_env["dependencies"].append(f"{wc.asm}=={version}")
+        yaml.safe_dump(conda_env, ofh)
+
+    return output_conda_env

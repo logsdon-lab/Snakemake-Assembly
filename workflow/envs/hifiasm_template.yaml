@@ -1,0 +1,7 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - yak==0.1
+  - hifiasm
+  - samtools==1.21

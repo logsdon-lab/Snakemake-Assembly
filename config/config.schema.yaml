@@ -30,6 +30,13 @@ properties:
             enum: ["hifiasm", "verkko"]
             default: hifiasm
             description: Assembler to use.
+          version:
+            type: string
+            default: null
+            description: >-
+              Use a specific assembler conda version.
+              Allows programmatically generating multiple conda envs with different assembler versions.
+              For benchmarking. Don't set unless you need it.
           data:
             type: object
             additional_properties: false

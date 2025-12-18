@@ -1,0 +1,8 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - verkko
+  - merqury==1.3
+  - seqtk==1.4
+  - samtools==1.21

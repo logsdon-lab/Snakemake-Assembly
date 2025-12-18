@@ -1,3 +1,6 @@
+from enum import Enum
+
+
 SAMPLES = config["samples"].keys()
 OUTPUT_DIR = config["output_dir"]
 BENCHMARK_DIR = config["benchmark_dir"]

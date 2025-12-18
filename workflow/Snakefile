@@ -7,8 +7,8 @@ validate(config, "../config/config.schema.yaml")
 shell.prefix("set -euo pipefail;")
 
 
-include: "rules/common.smk"
 include: "rules/constants.smk"
+include: "rules/common.smk"
 include: "rules/data.smk"
 include: "rules/assembly.smk"
 

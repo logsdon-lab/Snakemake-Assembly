@@ -99,7 +99,7 @@ checkpoint run_assembler:
         # Don't use output directory as will delete directory if fail.
         touch(join(OUTPUT_DIR, "{asm}", "{sm}.done")),
     conda:
-        "../envs/{asm}.yaml"
+        dynamic_assembler_conda_env
     threads: lambda wc: config["samples"][str(wc.sm)]["threads"]
     resources:
         mem=lambda wc: config["samples"][str(wc.sm)]["mem"],
@@ -143,7 +143,7 @@ checkpoint convert_gfa_to_fa:
     wildcard_constraints:
         asm="hifiasm",
     conda:
-        "../envs/{asm}.yaml"
+        dynamic_assembler_conda_env
     shell:
         """
         awk '/^S/{{ print ">"$2; print $3 }}' {input} > {output.fa} 2> {log}
@@ -189,7 +189,7 @@ rule hifiasm_output:
     wildcard_constraints:
         asm="hifiasm",
     conda:
-        "../envs/{asm}.yaml"
+        dynamic_assembler_conda_env
     shell:
         """
         cat {input.fa} > {output.fa}
