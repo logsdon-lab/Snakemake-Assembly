@@ -203,10 +203,16 @@ rule verkko_output:
     output:
         fa=join(OUTPUT_DIR, "{asm}", "{sm}", "assembly.fasta"),
         fai=join(OUTPUT_DIR, "{asm}", "{sm}", "assembly.fasta.fai"),
+    params:
+        consensus_path=join(
+            OUTPUT_DIR, "{asm}", "{sm}", "7-consensus", "assembly.fasta"
+        ),
     wildcard_constraints:
         asm="verkko",
     shell:
         """
+        # https://stackoverflow.com/a/25337466
+        cp {params.consensus_path} {output.fa} 2>/dev/null || :
         samtools faidx {output.fa}
         """
 
