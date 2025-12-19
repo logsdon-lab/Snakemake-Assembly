@@ -31,7 +31,7 @@ properties:
             default: hifiasm
             description: Assembler to use.
           version:
-            type: string
+            type: ["string", "null"]
             default: null
             description: >-
               Use a specific assembler conda version.
