@@ -46,10 +46,10 @@ def find_sep_command(
 # We want to be able to set version programmatically for testing multiple versions.
 def dynamic_assembler_conda_env(wc) -> str:
     if not config["samples"][wc.sm].get("version"):
-        return workflow.source_path(f"workflow/envs/{wc.asm}.yaml")
+        return f"../envs/{wc.asm}.yaml"
 
     version = config["samples"][wc.sm]["version"]
-    template_conda_env = workflow.source_path(f"workflow/envs/{wc.asm}_template.yaml")
+    template_conda_env = f"../envs/{wc.asm}_template.yaml"
     output_conda_dir = join(OUTPUT_DIR, wc.asm, wc.sm)
     output_conda_env = abspath(join(output_conda_dir, "env.yaml"))
     os.makedirs(output_conda_dir, exist_ok=True)
