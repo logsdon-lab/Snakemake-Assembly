@@ -270,14 +270,25 @@ rule cleanup_tmp_fastq:
             if config["samples"][str(wc.sm)]["data"].get("hifi")
             else []
         ),
+    params:
+        cmd_delete_ont=lambda wc, input: (
+            f"awk 'index($1, \".tmp.fastq\")' {input.ont_fofn} | xargs rm -f"
+            if input.ont_fofn
+            else "echo 'No ONT to delete'"
+        ),
+        cmd_delete_hifi=lambda wc, input: (
+            f"awk 'index($1, \".tmp.fastq\")' {input.hifi_fofn} | xargs rm -f"
+            if input.hifi_fofn
+            else "echo 'No hifi to delete'"
+        )
     output:
         touch(join(OUTPUT_DIR, "{asm}", "{sm}_cleanup_fastq.done")),
     shell:
         """
         # Only remove files with suffix .tmp.fastq
         # Make sure that none of your original files are named with this suffix!
-        awk 'index($1, ".tmp.fastq")' {input.ont_fofn} | xargs rm -f
-        awk 'index($1, ".tmp.fastq")' {input.hifi_fofn} | xargs rm -f
+        {params.cmd_delete_ont}
+        {params.cmd_delete_hifi}
         """
 
 
