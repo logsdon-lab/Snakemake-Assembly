@@ -90,7 +90,7 @@ rule generate_dtype_fofn:
         cat {input} | xargs -P {resources.processes} -I {{}} bash -c '
             if [[ {{}} == *.bam ]]; then
                 md5_checksum=$(md5sum {{}} | cut -c -32)
-                tmp_outfq="{resources.tmp_dir}/${{md5_checksum}}.fastq";
+                tmp_outfq="{resources.tmp_dir}/${{md5_checksum}}.tmp.fastq";
                 if [[ -f "${{tmp_outfq}}" ]]; then
                     echo "${{tmp_outfq}}";
                     exit 0;

@@ -39,7 +39,7 @@ def find_sep_command(
     )
     cmd = f"find {indir}/ {include_flags} {exclude_flags}"
     if with_paste:
-        cmd += " | paste -sd '{sep}'"
+        cmd += f" | paste -sd '{sep}'"
     return cmd
 
 

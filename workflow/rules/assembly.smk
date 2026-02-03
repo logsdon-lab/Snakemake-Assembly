@@ -31,8 +31,9 @@ def phasing_data_args(wc, inputs) -> str:
         mat_hic_dir = abspath(inputs.mat_hic_dir[0])
         pat_hic_dir = abspath(inputs.pat_hic_dir[0])
         # Construct find command.
-        mat_find_cmd = find_sep_command(wc.sm, "hic_mat", mat_hic_dir, sep=",")
-        pat_find_cmd = find_sep_command(wc.sm, "hic_pat", pat_hic_dir, sep=",")
+        sep = " " if wc.asm == "verkko" else ","
+        mat_find_cmd = find_sep_command(wc.sm, "hic_mat", mat_hic_dir, sep=sep)
+        pat_find_cmd = find_sep_command(wc.sm, "hic_pat", pat_hic_dir, sep=sep)
         if wc.asm == "verkko":
             return f"--hic1 $({mat_find_cmd}) --hic2 $({pat_find_cmd})"
         else:
@@ -280,7 +281,7 @@ rule cleanup_tmp_fastq:
             f"awk 'index($1, \".tmp.fastq\")' {input.hifi_fofn} | xargs rm -f"
             if input.hifi_fofn
             else "echo 'No hifi to delete'"
-        )
+        ),
     output:
         touch(join(OUTPUT_DIR, "{asm}", "{sm}_cleanup_fastq.done")),
     shell:
