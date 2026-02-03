@@ -55,7 +55,7 @@ def get_data_dirs() -> defaultdict[str, defaultdict[str, list[str]]]:
 DATA_DIRS = get_data_dirs()
 
 
-checkpoint generate_original_dtype_fofn:
+rule generate_original_dtype_fofn:
     input:
         dtype_dir=lambda wc: DATA_DIRS[wc.sm][wc.dtype],
     output:
@@ -68,54 +68,39 @@ checkpoint generate_original_dtype_fofn:
         """
 
 
-def check_for_bams(wc):
-    fofn = checkpoints.generate_original_dtype_fofn.get(**wc).output
-    all_files = []
-    with open(fofn[0], "rt") as fh:
-        for file in fh.readlines():
-            file = file.strip()
-            indir, fname = split(file)
-            if fname.endswith(".bam"):
-                bname, ext = splitext(fname)
-                new_fname = join(indir, bname)
-                all_files.append(
-                    expand(rules.convert_bam_to_fastq.output, fname=new_fname)
-                )
-            elif fname.endswith(".tmp.fastq"):
-                raise ValueError(
-                    f"{fname} contains a reserved suffix (.tmp.fastq). Please change this to something else."
-                )
-            else:
-                all_files.append(file)
-    return all_files
-
-
 # Issue with gzip so uncompressed.
 # https://github.com/marbl/verkko/issues/320
-rule convert_bam_to_fastq:
-    input:
-        bam="{fname}.bam",
-    output:
-        fastq="{fname}.tmp.fastq",
-    threads: 8
-    log:
-        "{fname}.to_fastq.log",
-    conda:
-        "../envs/data.yaml"
-    shell:
-        """
-        samtools bam2fq --threads {threads} {input.bam} > {output.fastq} 2> {log}
-        # Index file to ensure non-empty
-        samtools faidx {output.fastq} -o /dev/null
-        """
-
-
 rule generate_dtype_fofn:
     input:
-        unpack(check_for_bams),
+        rules.generate_original_dtype_fofn.output,
     output:
         join(OUTPUT_DIR, "{asm}", "{sm}_{dtype}_final.fofn"),
+    threads: 16
+    resources:
+        processes=4,
+        threads_per_file=4,
+        tmp_dir=lambda wc: abspath(join(OUTPUT_DIR, "tmp")),
+    conda:
+        "../envs/data.yaml"
+    log:
+        join(LOG_DIR, "generate_dtype_fofn_{asm}_{dtype}_{sm}.log"),
     shell:
         """
-        ls {input} > {output}
+        mkdir -p {resources.tmp_dir}
+        cat {input} | xargs -P {resources.processes} -I {{}} bash -c '
+            if [[ {{}} == *.bam ]]; then
+                md5_checksum=$(md5sum {{}} | cut -c -32)
+                tmp_outfq="{resources.tmp_dir}/${{md5_checksum}}.fastq";
+                if [[ -f "${{tmp_outfq}}" ]]; then
+                    echo "${{tmp_outfq}}";
+                    exit 0;
+                fi
+                samtools bam2fq --threads {resources.threads_per_file} {{}} > "${{tmp_outfq}}" 2> {log}
+                # Index file to ensure non-empty
+                samtools faidx "${{tmp_outfq}}" -o /dev/null
+                echo "${{tmp_outfq}}"
+            else
+                echo "{{}}"
+            fi
+        ' > {output}
         """

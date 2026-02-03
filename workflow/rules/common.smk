@@ -48,14 +48,14 @@ def dynamic_assembler_conda_env(wc) -> str:
     if not config["samples"][wc.sm].get("version"):
         return (
             f"../envs/{wc.asm}.yaml"
-            if os.path.exists(f"../envs/{wc.asm}.yaml")
+            if os.path.exists(f"workflow/envs/{wc.asm}.yaml")
             else workflow.source_path(f"workflow/envs/{wc.asm}.yaml")
         )
 
     version = config["samples"][wc.sm]["version"]
     template_conda_env = (
         f"../envs/{wc.asm}_template.yaml"
-        if os.path.exists(f"../envs/{wc.asm}_template.yaml")
+        if os.path.exists(f"workflow/envs/{wc.asm}_template.yaml")
         else workflow.source_path(f"workflow/envs/{wc.asm}_template.yaml")
     )
 
