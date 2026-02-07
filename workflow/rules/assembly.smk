@@ -248,7 +248,15 @@ rule generate_summary_stats:
 
 rule cleanup_tmp_fastq:
     input:
-        asm=rules.run_assembler.output,
+        # Force all assemblies to be done before cleanup.
+        asm=[
+            expand(
+                rules.run_assembler.output,
+                sm=sm,
+                asm=config["samples"][sm]["assembler"],
+            )
+            for sm in SAMPLES
+        ],
         ont_fofn=lambda wc: (
             expand(
                 rules.generate_dtype_fofn.output,

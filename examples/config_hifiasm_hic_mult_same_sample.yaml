@@ -1,0 +1,35 @@
+samples:
+  mPanTro3_hifiasm:
+    threads: 40
+    assembler: hifiasm
+    mem: 250GB
+    data:
+      ont:
+        path: /project/logsdon_shared/data/PrimateT2T/ont/mPanTro3
+        include: ["*.fq.gz"]
+      hifi:
+        path: /project/logsdon_shared/data/PrimateT2T/hifi_data/mPanTro3
+        include: ["*.hifi_reads.fq.gz"]
+      hic_mat:
+        path: /project/logsdon_shared/data/PrimateT2T/dovetail_hic/mPanTro3
+        include: ["*R1*fastq.gz"]
+      hic_pat:
+        path: /project/logsdon_shared/data/PrimateT2T/dovetail_hic/mPanTro3
+        include: ["*R2*fastq.gz"]
+  mPanTro3_verkko:
+    threads: 40
+    assembler: verkko
+    mem: 250GB
+    data:
+      ont:
+        path: /project/logsdon_shared/data/PrimateT2T/ont/mPanTro3
+        include: ["*.fq.gz"]
+      hifi:
+        path: /project/logsdon_shared/data/PrimateT2T/hifi_data/mPanTro3
+        include: ["*.hifi_reads.fq.gz"]
+      hic_mat:
+        path: /project/logsdon_shared/data/PrimateT2T/dovetail_hic/mPanTro3
+        include: ["*R1*fastq.gz"]
+      hic_pat:
+        path: /project/logsdon_shared/data/PrimateT2T/dovetail_hic/mPanTro3
+        include: ["*R2*fastq.gz"]
