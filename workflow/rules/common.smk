@@ -37,7 +37,7 @@ def find_sep_command(
         pre_opt=r"-not \( -name",
         post_opt=r"-prune \)",
     )
-    cmd = f"find {indir}/ {include_flags} {exclude_flags}"
+    cmd = f"find {indir}/ {include_flags} {exclude_flags} | sort"
     if with_paste:
         cmd += f" | paste -sd '{sep}'"
     return cmd
