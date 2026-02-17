@@ -2,6 +2,7 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
+  - python==3.11.14
   - verkko==2.3
   - merqury==1.3
   - seqtk==1.4
