@@ -104,6 +104,7 @@ checkpoint run_assembler:
     threads: lambda wc: config["samples"][str(wc.sm)]["threads"]
     resources:
         mem=lambda wc: config["samples"][str(wc.sm)]["mem"],
+        local_mem=lambda wc: config["samples"][str(wc.sm)]["mem"].replace("GB", ""),
         lsf_extra=lambda wc: "-M " + config["samples"][str(wc.sm)]["mem"],
     log:
         abspath(join(LOG_DIR, "run_{asm}_{sm}.log")),
@@ -120,7 +121,8 @@ checkpoint run_assembler:
             verkko -d {params.output_dir} \
             {params.input_args} \
             {params.phasing_data_args} \
-            {params.added_args} &> {log}
+            {params.added_args} \
+            --local-memory {resources.local_mem} &> {log}
         else
             mkdir -p {params.output_dir} && cd {params.output_dir}
             hifiasm \
