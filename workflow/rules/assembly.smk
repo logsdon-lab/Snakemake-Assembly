@@ -214,8 +214,11 @@ rule verkko_output:
         asm="verkko",
     shell:
         """
-        # https://stackoverflow.com/a/25337466
-        cp {params.consensus_path} {output.fa} 2>/dev/null || :
+        # If Hi-C, verkko will copy to output.fa.
+        # https://github.com/marbl/verkko/blob/584a640042f7d77ea91d6a6b313e366774870745/src/verkko.sh#L1551
+        if [[ ! -f "{output.fa}" ]]; then
+            cp {params.consensus_path} {output.fa}
+        fi
         samtools faidx {output.fa}
         """
 
