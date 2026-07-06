@@ -43,6 +43,7 @@ def get_data_dirs() -> defaultdict[str, defaultdict[str, list[str]]]:
 
             if isinstance(output_dir, str):
                 outputs[sm][dtype].append(output_dir)
+            # Also can be multiple paths, not dirs
             elif isinstance(output_dir, list):
                 outputs[sm][dtype].extend(output_dir)
             else:
@@ -64,7 +65,20 @@ rule generate_original_dtype_fofn:
         glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), wc.dtype), pre_opt="-name"),
     shell:
         """
-        find {input.dtype_dir}/ {params.glob} > {output.fofn}
+        for infile in {input.dtype_dir}; do
+            if [[ -f "${{infile}}" ]]; then
+                # Is file
+                echo "${{infile}}" >> {output.fofn}
+            else
+                # Is directory
+                if [[ -z "{params.glob}" ]]; then
+                    echo "Need glob for input directory, '${{infile}}'"
+                    rm -f {output.fofn}
+                    exit 1
+                fi
+                find "${{infile}}/" {params.glob} >> {output.fofn}
+            fi
+        done
         """
 
 
