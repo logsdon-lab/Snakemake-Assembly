@@ -26,6 +26,14 @@ class DataType(Enum):
     ILLUMINA_PAT = "illumina_pat"
 
 
+# Store environment files for assemblers
+ASM_ENVS = {}
+for asm in Assembler:
+    asm = asm.value
+    ASM_ENVS[asm] = workflow.source_path(f"../envs/{asm}.yaml")
+    ASM_ENVS[f"{asm}_template"] = workflow.source_path(f"../envs/{asm}_template.yaml")
+
+
 wildcard_constraints:
     asm="|".join(a.value for a in Assembler),
     sm="|".join(SAMPLES),
