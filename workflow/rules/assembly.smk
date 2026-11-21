@@ -150,7 +150,7 @@ checkpoint convert_gfa_to_fa:
     shell:
         """
         awk '/^S/{{ print ">"$2; print $3 }}' {input} > {output.fa} 2> {log}
-        samtools faidx {output.fa} 2>> {log}
+        {{ samtools faidx {output.fa} || true ;}} 2>> {log}
         """
 
 

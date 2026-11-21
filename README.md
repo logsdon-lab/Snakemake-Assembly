@@ -63,13 +63,16 @@ The following data types are supported for `{sm}.data.{dtype}`.
 > This workflow makes large temporary files for ONT and HiFI data and cleans them up on workflow completion. By default, the temp directory is `{output}/tmp`.
 
 #### Sources
-Data sources can be either local or on AWS:
+Data sources can be either a local path, a url, or an AWS uri:
 
 `path`
 * `{sm}.data.{dtype}.path` will get data from local directory.
 
 `uri`
 * `{sm}.data.{dtype}.uri` will `aws sync` from the specified S3 uri.
+
+`url`
+* `{sm}.data.{dtype}.url` will `wget` from the specified url.
 
 ##### Local
 ```yaml
@@ -108,6 +111,20 @@ samples:
         uri: s3://genomeark/species/Pan_troglodytes/mPanTro3/genomic_data/pacbio_hifi/
         include: ["*.hifi_reads.fq.gz"]
         exclude: ["*previous-versions/*", "*.bam*", "*ccs*"]
+```
+
+##### URL
+```yaml
+samples:
+  Ecoli:
+    threads: 4
+    mem: 10GB
+    assembler: hifiasm
+    data:
+      ont:
+        url: https://obj.umiacs.umd.edu/sergek/shared/ecoli_ont_subset50x.fastq.gz
+      hifi:
+        url: https://obj.umiacs.umd.edu/sergek/shared/ecoli_hifi_subset24x.fastq.gz
 ```
 
 ### Analyses

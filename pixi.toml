@@ -1,0 +1,12 @@
+[workspace]
+authors = ["Keith Oshima <koshima789@gmail.com>"]
+channels = ["conda-forge", "bioconda"]
+name = "Snakemake-Assembly"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+snakemake = "==9.5.0"
+conda = ">=26.10.0,<27"

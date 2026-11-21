@@ -1,18 +1,25 @@
 
-rule aws_sync:
+
+def download_cmd(wc, output) -> str:
+    data_config = get_dtype_config(str(wc.sm), str(wc.dtype))
+    if "uri" in data_config:
+        uri = data_config["uri"]
+        include_flag = multi_flags(*data_config.get("include", []), pre_opt="--include")
+        exclude_flag = multi_flags(*data_config.get("exclude", []), pre_opt="--exclude")
+        return f"aws s3 --no-sign-request sync {uri} {output} {include_flag} {exclude_flag} "
+    elif "url" in data_config:
+        url = data_config["url"]
+        return f"wget {url} -P {output}"
+    else:
+        raise NotImplementedError
+
+
+rule download_data:
     output:
         # NOTE: This will delete files on failed runs. Probably better way to trigger reruns.
         directory(join("data", "{dtype}", "{sm}")),
     params:
-        uri=lambda wc: get_data_config(str(wc.sm)).get(str(wc.dtype), {}).get("uri"),
-        include=lambda wc: multi_flags(
-            *get_dtype_config(str(wc.sm), str(wc.dtype)).get("include", []),
-            pre_opt="--include",
-        ),
-        exclude=lambda wc: multi_flags(
-            *get_dtype_config(str(wc.sm), str(wc.dtype)).get("exclude", []),
-            pre_opt="--exclude",
-        ),
+        cmd=lambda wc, output: download_cmd(wc, output)
     threads: 1
     log:
         join(LOG_DIR, "download_{dtype}_{sm}.log"),
@@ -22,8 +29,7 @@ rule aws_sync:
         "../envs/data.yaml"
     shell:
         """
-        aws s3 --no-sign-request sync {params.uri} {output} \
-        {params.include} {params.exclude} &> {log}
+        {params.cmd} &> {log}
         """
 
 
@@ -36,8 +42,8 @@ def get_data_dirs() -> defaultdict[str, defaultdict[str, list[str]]]:
             except ValueError:
                 raise ValueError(f"Invalid datatype: {dtype}")
 
-            if settings.get("uri"):
-                output_dir = expand(rules.aws_sync.output, sm=sm, dtype=dtype)
+            if settings.get("uri") or settings.get("url"):
+                output_dir = expand(rules.download_data.output, sm=sm, dtype=dtype)
             elif settings.get("path"):
                 output_dir = settings["path"]
 
@@ -62,6 +68,7 @@ rule generate_original_dtype_fofn:
     output:
         fofn=join(OUTPUT_DIR, "{asm}", "{sm}_{dtype}_original.fofn"),
     params:
+        url_bname=lambda wc: basename(get_dtype_config(wc.sm, wc.dtype).get("url", "")),
         glob=lambda wc: multi_flags(*dtype_glob(str(wc.sm), wc.dtype), pre_opt="-name"),
     shell:
         """
@@ -69,6 +76,9 @@ rule generate_original_dtype_fofn:
             if [[ -f "${{infile}}" ]]; then
                 # Is file
                 echo "${{infile}}" >> {output.fofn}
+            # Is URL
+            elif [[ ! -z {params.url_bname} ]]; then
+                realpath "${{infile}}/{params.url_bname}" >> {output.fofn}
             else
                 # Is directory
                 if [[ -z "{params.glob}" ]]; then

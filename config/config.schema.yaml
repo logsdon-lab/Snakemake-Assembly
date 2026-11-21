@@ -50,6 +50,9 @@ properties:
                   uri:
                     type: string
                     description: AWS uri.
+                  url:
+                    type: string
+                    description: URL to file.
                   include:
                     type: array
                     items:
@@ -69,6 +72,9 @@ properties:
                   uri:
                     type: string
                     description: AWS uri.
+                  url:
+                    type: string
+                    description: URL to file.
                   include:
                     type: array
                     items:
@@ -88,6 +94,9 @@ properties:
                   uri:
                     type: string
                     description: AWS uri.
+                  url:
+                    type: string
+                    description: URL to file.
                   include:
                     type: array
                     items:
@@ -107,6 +116,9 @@ properties:
                   uri:
                     type: string
                     description: AWS uri.
+                  url:
+                    type: string
+                    description: URL to file.
                   include:
                     type: array
                     items:
@@ -126,6 +138,9 @@ properties:
                   uri:
                     type: string
                     description: AWS uri.
+                  url:
+                    type: string
+                    description: URL to file.
                   include:
                     type: array
                     items:
@@ -148,6 +163,9 @@ properties:
                   uri:
                     type: string
                     description: AWS uri.
+                  url:
+                    type: string
+                    description: URL to file.
                   include:
                     type: array
                     items:

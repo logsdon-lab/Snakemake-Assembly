@@ -7,3 +7,6 @@ results*
 !config/config.schema.yaml
 exp
 Snakemake*
+# pixi environments
+.pixi/*
+!.pixi/config.toml
